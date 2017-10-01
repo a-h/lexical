@@ -32,3 +32,34 @@ func TestItemEquality(t *testing.T) {
 		}
 	}
 }
+
+func TestItemString(t *testing.T) {
+	tests := []struct {
+		input    Item
+		expected string
+	}{
+		{
+			input:    Item{Type: ItemTypeError, Value: "Error message"},
+			expected: "Error message",
+		},
+		{
+			input:    Item{Type: ItemTypeEOF, Value: "Doesn't matter"},
+			expected: "EOF",
+		},
+		{
+			input:    Item{Type: ItemType(666), Value: "Hello"},
+			expected: "Hello",
+		},
+		{
+			input:    Item{Type: ItemType(666), Value: "Don't forget your lucky number."},
+			expected: "Don't forg...",
+		},
+	}
+
+	for i, test := range tests {
+		actual := test.input.String()
+		if actual != test.expected {
+			t.Errorf("test %v: expected '%v', but got '%v'", i, test.expected, actual)
+		}
+	}
+}
