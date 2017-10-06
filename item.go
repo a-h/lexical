@@ -23,7 +23,7 @@ func (item Item) String() string {
 	case ItemTypeEOF:
 		return "EOF"
 	case ItemTypeError:
-		return item.Value
+		return fmt.Sprintf("err: %v", item.Value)
 	}
 	if len(item.Value) > 13 {
 		return fmt.Sprintf("%v...", item.Value[0:10])

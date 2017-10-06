@@ -40,7 +40,7 @@ func TestItemString(t *testing.T) {
 	}{
 		{
 			input:    Item{Type: ItemTypeError, Value: "Error message"},
-			expected: "Error message",
+			expected: "err: Error message",
 		},
 		{
 			input:    Item{Type: ItemTypeEOF, Value: "Doesn't matter"},
