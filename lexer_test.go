@@ -214,3 +214,74 @@ func wordState(l *Lexer) StateFunction {
 	l.Emit(ItemTypeEOF)
 	return nil
 }
+
+func TestThatTheLexerCannotGetStuckInALoop(t *testing.T) {
+	bs := bytes.NewBufferString("abcdefg")
+	sr := bufio.NewReader(bs)
+	var wordReader func(lex *Lexer) StateFunction
+	wordReader = func(lex *Lexer) StateFunction {
+		return wordReader
+	}
+	l := NewLexer("empty", sr, wordReader)
+
+	actual := []Item{}
+	for item := range l.Items {
+		actual = append(actual, item)
+	}
+
+	if len(actual) != 1 {
+		t.Errorf("expected only an error item, but got %v items", len(actual))
+		return
+	}
+	if actual[0].Type != ItemTypeError {
+		t.Errorf("expected an error, but got an item of type %v", actual[0].Type)
+	}
+	if actual[0].Value != "lexer: stuck in a loop at position -1" {
+		t.Errorf("unexpected error message '%v'", actual[0].Value)
+	}
+}
+
+func TestLeftAndRight(t *testing.T) {
+	tests := []struct {
+		input  string
+		middle int
+		left   string
+		right  string
+	}{
+		{
+			input:  "abcd",
+			middle: 2,
+			left:   "ab",
+			right:  "cd",
+		},
+		{
+			input:  "abcd",
+			middle: 4,
+			left:   "abcd",
+			right:  "",
+		},
+		{
+			input:  "abcd",
+			middle: 0,
+			left:   "",
+			right:  "abcd",
+		},
+		{
+			input:  "abcd",
+			middle: 5,
+			left:   "abcd",
+			right:  "",
+		},
+	}
+
+	for _, test := range tests {
+		l := getLeft([]rune(test.input), test.middle)
+		if string(l) != test.left {
+			t.Errorf("for input '%v', at middle %v, expected left of '%v' but got '%v'", test.input, test.middle, test.left, string(l))
+		}
+		r := getRight([]rune(test.input), test.middle)
+		if string(r) != test.right {
+			t.Errorf("for input '%v', at middle %v, expected right of '%v' but got '%v'", test.input, test.middle, test.right, string(l))
+		}
+	}
+}
