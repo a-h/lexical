@@ -3,7 +3,6 @@ package lexical
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io"
 	"testing"
 	"unicode"
@@ -31,7 +30,6 @@ func TestUntil(t *testing.T) {
 
 	actual := []Item{}
 	for item := range l.Items {
-		fmt.Printf("received item: '%v'\n", item)
 		actual = append(actual, item)
 	}
 }
@@ -82,7 +80,6 @@ func TestUntilAdvanced(t *testing.T) {
 
 	actual := []Item{}
 	for item := range l.Items {
-		fmt.Printf("received item: '%v'\n", item)
 		actual = append(actual, item)
 	}
 

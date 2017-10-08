@@ -105,7 +105,11 @@ func TestThatTheLexerCannotRetreatBeforeTheStartOfAStream(t *testing.T) {
 	expectRune(l.Retreat, 'A', t, "retreat back to a")
 
 	// Expect an empty rune because we're right back at the start of the stream.
-	expectRune(l.Retreat, 0x0, t, "expect to be back at the start of the stream")
+	_, err := l.Retreat()
+	if err != ErrStartOfFile {
+		t.Errorf("expected to be back at the start of the stream")
+	}
+
 	// But can't go past the start of the stream.
 	r, err := l.Retreat()
 	if err == nil {

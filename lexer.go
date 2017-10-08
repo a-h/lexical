@@ -29,6 +29,8 @@ type Lexer struct {
 	Items chan Item
 	// CurrentRune is the current rune at the cursor.
 	CurrentRune rune
+	// Position is the current position within the file.
+	Position Position
 }
 
 func (l *Lexer) String() string {
@@ -44,6 +46,7 @@ func NewLexer(name string, input *bufio.Reader, start StateFunction) *Lexer {
 		Items:     make(chan Item),
 		Current:   -1,
 		readUntil: -1,
+		Position:  NewPosition(1, 0),
 	}
 	go l.Run(start)
 	return l
@@ -109,6 +112,7 @@ func (l *Lexer) Advance() (rune, error) {
 	if l.Current+1 <= l.readUntil {
 		l.Current++
 		l.CurrentRune = l.Buffer[l.Current-l.Start]
+		l.Position.Advance(l.CurrentRune)
 		return l.CurrentRune, nil
 	}
 
@@ -117,6 +121,7 @@ func (l *Lexer) Advance() (rune, error) {
 	l.Current++
 	l.readUntil = l.Current
 	l.CurrentRune = r
+	l.Position.Advance(l.CurrentRune)
 	return r, err
 }
 
@@ -127,23 +132,29 @@ func (l *Lexer) Peek() (rune, error) {
 		return r, fmt.Errorf("lexer.peek: failed to advance: %v", err)
 	}
 	_, err = l.Retreat()
-	return r, err
+	if err != ErrStartOfFile {
+		return r, err
+	}
+	return r, nil
 }
+
+// ErrStartOfFile is the error used when we've retreated to the start of the file and can't
+// retreat any further.
+var ErrStartOfFile = errors.New("SOF")
 
 // Retreat steps back a rune.
 func (l *Lexer) Retreat() (rune, error) {
 	newPos := l.Current - 1
-	if newPos < -1 {
+	if newPos <= -1 {
 		l.Current = -1
 		l.CurrentRune = 0x0
-		return 0x0, errors.New("cannot retreat past the start of the stream")
+		l.Position.Retreat(l.CurrentRune)
+		return 0x0, ErrStartOfFile
 	}
 	l.Current = newPos
-	if l.Current > -1 {
-		l.CurrentRune = l.Buffer[l.Current-l.Start]
-		return l.CurrentRune, nil
-	}
-	return 0x0, nil
+	l.CurrentRune = l.Buffer[l.Current-l.Start]
+	l.Position.Retreat(l.CurrentRune)
+	return l.CurrentRune, nil
 }
 
 // StateFunction represents the state of the scanner as a function that returns
