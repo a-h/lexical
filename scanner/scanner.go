@@ -11,15 +11,15 @@ type Scanner struct {
 	Parser parse.Function
 }
 
-func (s *Scanner) Next() (parse.ResultItem, error) {
+func (s *Scanner) Next() parse.Result {
 	result := s.Parser(s.Input)
-	success := result.Success()
-	if !success {
+	success := result.Success
+	if !success && result.Error != nil {
 		line, col := s.Input.Position()
-		return nil, fmt.Errorf("scanner: unmatched at line %v, column %v", line, col)
+		result.Error = fmt.Errorf("scanner: unmatched at line %v, column %v", line, col)
 	}
-	s.Parser = result.Next()
-	return result.Item(), result.Error()
+	s.Parser = result.Next
+	return result
 }
 
 // New creates a new Scanner.

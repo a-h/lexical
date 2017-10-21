@@ -14,7 +14,7 @@ import (
 func any(pi parse.Input) parse.Result {
 	_, err := pi.Advance()
 	s := pi.Collect()
-	return parse.String("any", s, any, err)
+	return parse.Success("any", s, any, err)
 }
 
 func uppercase(pi parse.Input) parse.Result {
@@ -23,9 +23,9 @@ func uppercase(pi parse.Input) parse.Result {
 	if strings.ContainsRune(allowed, pr) {
 		_, err = pi.Advance()
 		value := pi.Collect()
-		return parse.String("uppercase", value, uppercase, err)
+		return parse.Success("uppercase", value, uppercase, err)
 	}
-	return parse.Failure()
+	return parse.Failure("uppercase", fmt.Errorf("Expected A-Z, but got '%v'", pr))
 }
 
 func TestScanning(t *testing.T) {
@@ -36,12 +36,11 @@ func TestScanning(t *testing.T) {
 	scanner := New(stream, any)
 	var err error
 	for {
-		item, err := scanner.Next()
-		if err != nil {
+		result := scanner.Next()
+		if result.Error != nil {
 			break
 		}
-		fmt.Println(item)
-		fmt.Println(item.Name())
+		fmt.Println(result)
 	}
 	if err != nil {
 		t.Error(err)
