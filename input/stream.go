@@ -1,4 +1,4 @@
-package lexical
+package input
 
 import (
 	"bufio"
@@ -6,8 +6,8 @@ import (
 	"fmt"
 )
 
-// Lexer defines a lexical scanner.
-type Lexer struct {
+// Stream defines a lexical scanner over a stream.
+type Stream struct {
 	// Name is used for error reports.
 	Name string
 	// Input holds the Reader being scanned.
@@ -25,62 +25,39 @@ type Lexer struct {
 	// 124 runes and have read 3 more runes without yet emitting a token, so current would
 	// be 124+3=127
 	Current int64
-	// Items is a channel where Items can be emitted.
-	Items chan Item
 	// CurrentRune is the current rune at the cursor.
 	CurrentRune rune
 	// Position is the current position within the file.
-	Position Position
+	position Position
 }
 
-func (l *Lexer) String() string {
+func (l *Stream) String() string {
 	return fmt.Sprintf("%v: Current Rune: '%v', Start of Token Position: %v, Current Position: %v, Forward Buffer Size: %v, Current Buffer: '%v'", l.Name, string(l.CurrentRune), l.Start, l.Current, len(l.Buffer), string(l.Buffer))
 }
 
-// NewLexer creates a new Lexer.
-func NewLexer(name string, input *bufio.Reader, start StateFunction) *Lexer {
-	l := &Lexer{
+// New creates a new parser input from a buffered reader.
+func New(name string, input *bufio.Reader) *Stream {
+	return &Stream{
 		Name:      name,
 		Input:     input,
 		Buffer:    make([]rune, 0),
-		Items:     make(chan Item),
 		Current:   -1,
 		readUntil: -1,
-		Position:  NewPosition(1, 0),
+		position:  NewPosition(1, 0),
 	}
-	go l.Run(start)
-	return l
 }
 
-// Run starts the lexing process. Tokens will be emitted on the Items channel.
-func (l *Lexer) Run(start StateFunction) {
-	lastPosition := l.Current
-	for state := start; state != nil; {
-		state = state(l)
-		if l.Current == lastPosition {
-			l.EmitError(fmt.Errorf("lexer: stuck in a loop at position %v", l.Current))
-			return
-		}
-		lastPosition = l.Current
-	}
-	close(l.Items) // No more tokens will be emitted.
-}
-
-// Emit emits a token to the waiting channel.
-func (l *Lexer) Emit(t ItemType) Item {
+// Collect returns the value of the consumed buffer and updates the position of the stream to the current
+// position.
+func (l *Stream) Collect() string {
 	// Emit the token and update the position of the lexer against the input stream.
 	// Returning the item helps with unit testing.
-	length := int(l.Current - l.Start)
+	length := int(l.Current - l.Start + 1)
 	left := getLeft(l.Buffer, length)
 	right := getRight(l.Buffer, length)
-	item := Item{
-		Type:  t,
-		Value: string(left),
-	}
-	l.Items <- item
 	l.Start = l.Current
 	l.Buffer = right
-	return item
+	return string(left)
 }
 
 func getLeft(runes []rune, length int) []rune {
@@ -97,22 +74,13 @@ func getRight(runes []rune, start int) []rune {
 	return runes[start:]
 }
 
-// EmitError emits an error to the waiting channel.
-func (l *Lexer) EmitError(err error) {
-	l.Items <- Item{
-		Type:  ItemTypeError,
-		Value: err.Error(),
-	}
-	close(l.Items)
-}
-
 // Advance reads a rune from the Input and sets the current position.
-func (l *Lexer) Advance() (rune, error) {
+func (l *Stream) Advance() (rune, error) {
 	// Check to see whether we already have it in the buffer, if so, read it from there.
 	if l.Current+1 <= l.readUntil {
 		l.Current++
 		l.CurrentRune = l.Buffer[l.Current-l.Start]
-		l.Position.Advance(l.CurrentRune)
+		l.position.Advance(l.CurrentRune)
 		return l.CurrentRune, nil
 	}
 
@@ -121,15 +89,15 @@ func (l *Lexer) Advance() (rune, error) {
 	l.Current++
 	l.readUntil = l.Current
 	l.CurrentRune = r
-	l.Position.Advance(l.CurrentRune)
+	l.position.Advance(l.CurrentRune)
 	return r, err
 }
 
 // Peek reads a rune from the Input, then sets the current position back.
-func (l *Lexer) Peek() (rune, error) {
+func (l *Stream) Peek() (rune, error) {
 	r, err := l.Advance()
 	if err != nil {
-		return r, fmt.Errorf("lexer.peek: failed to advance: %v", err)
+		return r, fmt.Errorf("stream.peek: failed to advance: %v", err)
 	}
 	_, err = l.Retreat()
 	if err != ErrStartOfFile {
@@ -143,38 +111,21 @@ func (l *Lexer) Peek() (rune, error) {
 var ErrStartOfFile = errors.New("SOF")
 
 // Retreat steps back a rune.
-func (l *Lexer) Retreat() (rune, error) {
+func (l *Stream) Retreat() (rune, error) {
 	newPos := l.Current - 1
 	if newPos <= -1 {
 		l.Current = -1
 		l.CurrentRune = 0x0
-		l.Position.Retreat(l.CurrentRune)
+		l.position.Retreat(l.CurrentRune)
 		return 0x0, ErrStartOfFile
 	}
 	l.Current = newPos
 	l.CurrentRune = l.Buffer[l.Current-l.Start]
-	l.Position.Retreat(l.CurrentRune)
+	l.position.Retreat(l.CurrentRune)
 	return l.CurrentRune, nil
 }
 
-// StateFunction represents the state of the scanner as a function that returns
-// the next state.
-type StateFunction func(*Lexer) StateFunction
-
-// AdvanceUntilRune advances the reader until the rune r is reached.
-func (l *Lexer) AdvanceUntilRune(r rune) (err error) {
-	return l.AdvanceUntil(func(rr rune) bool { return r == rr })
-}
-
-// AdvanceUntil advances the reader until the rule function returns true.
-func (l *Lexer) AdvanceUntil(rule func(r rune) bool) (err error) {
-	for {
-		cr, err := l.Advance()
-		if err != nil {
-			return err
-		}
-		if rule(cr) {
-			return nil
-		}
-	}
+// Position returns the current position within the stream.
+func (l *Stream) Position() (line, column int) {
+	return l.position.Line, l.position.Col
 }
