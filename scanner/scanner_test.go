@@ -1,8 +1,6 @@
 package scanner
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"strings"
 	"testing"
@@ -29,9 +27,7 @@ func uppercase(pi parse.Input) parse.Result {
 }
 
 func TestScanning(t *testing.T) {
-	bs := bytes.NewBufferString("ABCDEFG")
-	sr := bufio.NewReader(bs)
-	stream := input.New("Scanner Input", sr)
+	stream := input.NewFromString("Scanner Input", "ABCDEFG")
 
 	scanner := New(stream, any)
 	var err error

@@ -1,8 +1,6 @@
 package input
 
 import (
-	"bufio"
-	"bytes"
 	"testing"
 )
 
@@ -19,9 +17,7 @@ func TestStreamAdvance(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		bs := bytes.NewBufferString(test.input)
-		sr := bufio.NewReader(bs)
-		s := New("Advance Test", sr)
+		s := NewFromString("Advance Test", test.input)
 
 		for i, er := range test.input {
 			ar, err := s.Advance()
@@ -46,9 +42,7 @@ func expectRune(test func() (rune, error), expected rune, t *testing.T, name str
 }
 
 func TestStreamRetreat(t *testing.T) {
-	bs := bytes.NewBufferString("ABCDEFG")
-	sr := bufio.NewReader(bs)
-	s := New("Retreat Test", sr)
+	s := NewFromString("Retreat Test", "ABCDEFG")
 
 	expectRune(s.Advance, 'A', t, "1")
 	expectRune(s.Advance, 'B', t, "2")
@@ -66,10 +60,8 @@ func TestStreamRetreat(t *testing.T) {
 }
 
 func TestStreamAdvanceRetreat_UTF8(t *testing.T) {
-	bs := bytes.NewBufferString("你叫什么name？")
-	sr := bufio.NewReader(bs)
+	s := NewFromString("words", "你叫什么name？")
 
-	s := New("words", sr)
 	expectRune(s.Advance, '你', t, "1")
 	expectRune(s.Advance, '叫', t, "2")
 	expectRune(s.Advance, '什', t, "3")
@@ -91,9 +83,7 @@ func TestStreamAdvanceRetreat_UTF8(t *testing.T) {
 }
 
 func TestStreamRetreat_CannotReadBeforeStartOfStream(t *testing.T) {
-	bs := bytes.NewBufferString("ABCDEFG")
-	sr := bufio.NewReader(bs)
-	s := New("words", sr)
+	s := NewFromString("words", "ABCDEFG")
 
 	// Read the first two runes.
 	expectRune(s.Advance, 'A', t, "advance to a")
@@ -173,9 +163,7 @@ func TestStreamLeftAndRight(t *testing.T) {
 }
 
 func TestStreamPeek(t *testing.T) {
-	bs := bytes.NewBufferString("ABCDEFG")
-	sr := bufio.NewReader(bs)
-	s := New("words", sr)
+	s := NewFromString("words", "ABCDEFG")
 
 	startPosition := s.Current
 	startRune := s.CurrentRune
@@ -195,9 +183,7 @@ func TestStreamPeek(t *testing.T) {
 }
 
 func TestStreamCollect(t *testing.T) {
-	bs := bytes.NewBufferString("ABCDEFG")
-	sr := bufio.NewReader(bs)
-	s := New("words", sr)
+	s := NewFromString("words", "ABCDEFG")
 
 	s.Advance() // A
 	s.Advance() // B

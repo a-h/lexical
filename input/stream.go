@@ -2,6 +2,7 @@ package input
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 )
@@ -45,6 +46,13 @@ func New(name string, input *bufio.Reader) *Stream {
 		readUntil: -1,
 		position:  NewPosition(1, 0),
 	}
+}
+
+// NewFromString creates a new parser input from an input string.
+func NewFromString(name string, input string) *Stream {
+	bs := bytes.NewBufferString(input)
+	sr := bufio.NewReader(bs)
+	return New(name, sr)
 }
 
 // Collect returns the value of the consumed buffer and updates the position of the stream to the current
@@ -128,4 +136,9 @@ func (l *Stream) Retreat() (rune, error) {
 // Position returns the current position within the stream.
 func (l *Stream) Position() (line, column int) {
 	return l.position.Line, l.position.Col
+}
+
+// Index returns the current index position within the stream.
+func (l *Stream) Index() int64 {
+	return l.Current
 }

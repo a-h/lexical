@@ -15,6 +15,8 @@ type Input interface {
 	Peek() (rune, error)
 	// Position returns the line and column number of the current position within the stream.
 	Position() (line, column int)
+	// Index returns the current index of the parser input.
+	Index() int64
 }
 
 // Function represents the state of the scanner as a function that returns
