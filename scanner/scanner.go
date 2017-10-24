@@ -19,6 +19,7 @@ func (s *Scanner) Next() parse.Result {
 		result.Error = fmt.Errorf("scanner: unmatched at line %v, column %v", line, col)
 	}
 	s.Parser = result.Next
+	s.Input.Collect()
 	return result
 }
 

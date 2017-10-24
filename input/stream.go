@@ -105,7 +105,7 @@ func (l *Stream) Advance() (rune, error) {
 func (l *Stream) Peek() (rune, error) {
 	r, err := l.Advance()
 	if err != nil {
-		return r, fmt.Errorf("stream.peek: failed to advance: %v", err)
+		return r, err
 	}
 	_, err = l.Retreat()
 	if err != ErrStartOfFile {

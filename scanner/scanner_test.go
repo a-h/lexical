@@ -42,3 +42,10 @@ func TestScanning(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func xmlElement(pi parse.Input) parse.Result {
+	parse.Rune(pi, '<')
+	_, err := pi.Advance()
+	s := pi.Collect()
+	return parse.Success("any", s, any, err)
+}

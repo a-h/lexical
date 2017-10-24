@@ -13,5 +13,5 @@ func AnyRuneIn(pi Input, in string) Result {
 		_, err = pi.Advance()
 		return Success(name, pr, nil, err)
 	}
-	return Failure(name, fmt.Errorf("Expected A-Z, but got '%v'", pr))
+	return Failure(name, err)
 }
