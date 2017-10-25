@@ -25,13 +25,13 @@ func TestStreamAdvance(t *testing.T) {
 				t.Errorf("for input '%v', had fatal error at index %v: %v", test.input, i, err)
 			}
 			if ar != er {
-				t.Errorf("for input '%v', failed to advance to rune %v. Expected %d, got %d.", test.input, i, er, ar)
+				t.Errorf("for input '%v', failed to advance to rune %v. Expected %v, got %v.", test.input, i, string(er), string(ar))
 			}
 		}
 	}
 }
 
-func expectRune(test func() (rune, error), expected rune, t *testing.T, name string) {
+func expectRune(s *Stream, test func() (rune, error), expected rune, t *testing.T, name string) {
 	actual, err := test()
 	if err != nil {
 		t.Errorf("%v: expected rune: '%v', but got error: %v", name, string(expected), err)
@@ -44,53 +44,53 @@ func expectRune(test func() (rune, error), expected rune, t *testing.T, name str
 func TestStreamRetreat(t *testing.T) {
 	s := NewFromString("Retreat Test", "ABCDEFG")
 
-	expectRune(s.Advance, 'A', t, "1")
-	expectRune(s.Advance, 'B', t, "2")
-	expectRune(s.Advance, 'C', t, "3")
-	expectRune(s.Advance, 'D', t, "4")
-	expectRune(s.Retreat, 'C', t, "5")
-	expectRune(s.Retreat, 'B', t, "6")
-	expectRune(s.Retreat, 'A', t, "7")
-	expectRune(s.Advance, 'B', t, "8")
-	expectRune(s.Advance, 'C', t, "9")
-	expectRune(s.Advance, 'D', t, "10")
-	expectRune(s.Advance, 'E', t, "11")
-	expectRune(s.Advance, 'F', t, "12")
-	expectRune(s.Advance, 'G', t, "13")
+	expectRune(s, s.Advance, 'A', t, "1")
+	expectRune(s, s.Advance, 'B', t, "2")
+	expectRune(s, s.Advance, 'C', t, "3")
+	expectRune(s, s.Advance, 'D', t, "4")
+	expectRune(s, s.Retreat, 'C', t, "5")
+	expectRune(s, s.Retreat, 'B', t, "6")
+	expectRune(s, s.Retreat, 'A', t, "7")
+	expectRune(s, s.Advance, 'B', t, "8")
+	expectRune(s, s.Advance, 'C', t, "9")
+	expectRune(s, s.Advance, 'D', t, "10")
+	expectRune(s, s.Advance, 'E', t, "11")
+	expectRune(s, s.Advance, 'F', t, "12")
+	expectRune(s, s.Advance, 'G', t, "13")
 }
 
 func TestStreamAdvanceRetreat_UTF8(t *testing.T) {
 	s := NewFromString("words", "你叫什么name？")
 
-	expectRune(s.Advance, '你', t, "1")
-	expectRune(s.Advance, '叫', t, "2")
-	expectRune(s.Advance, '什', t, "3")
-	expectRune(s.Advance, '么', t, "4")
-	expectRune(s.Advance, 'n', t, "5")
-	expectRune(s.Advance, 'a', t, "6")
-	expectRune(s.Advance, 'm', t, "7")
-	expectRune(s.Advance, 'e', t, "8")
-	expectRune(s.Advance, '？', t, "9")
-	expectRune(s.Retreat, 'e', t, "10")
-	expectRune(s.Retreat, 'm', t, "11")
-	expectRune(s.Retreat, 'a', t, "12")
-	expectRune(s.Retreat, 'n', t, "13")
-	expectRune(s.Retreat, '么', t, "14")
-	expectRune(s.Retreat, '什', t, "15")
-	expectRune(s.Retreat, '叫', t, "16")
-	expectRune(s.Retreat, '你', t, "17")
-	expectRune(s.Advance, '叫', t, "18")
+	expectRune(s, s.Advance, '你', t, "1")
+	expectRune(s, s.Advance, '叫', t, "2")
+	expectRune(s, s.Advance, '什', t, "3")
+	expectRune(s, s.Advance, '么', t, "4")
+	expectRune(s, s.Advance, 'n', t, "5")
+	expectRune(s, s.Advance, 'a', t, "6")
+	expectRune(s, s.Advance, 'm', t, "7")
+	expectRune(s, s.Advance, 'e', t, "8")
+	expectRune(s, s.Advance, '？', t, "9")
+	expectRune(s, s.Retreat, 'e', t, "10")
+	expectRune(s, s.Retreat, 'm', t, "11")
+	expectRune(s, s.Retreat, 'a', t, "12")
+	expectRune(s, s.Retreat, 'n', t, "13")
+	expectRune(s, s.Retreat, '么', t, "14")
+	expectRune(s, s.Retreat, '什', t, "15")
+	expectRune(s, s.Retreat, '叫', t, "16")
+	expectRune(s, s.Retreat, '你', t, "17")
+	expectRune(s, s.Advance, '叫', t, "18")
 }
 
 func TestStreamRetreat_CannotReadBeforeStartOfStream(t *testing.T) {
 	s := NewFromString("words", "ABCDEFG")
 
 	// Read the first two runes.
-	expectRune(s.Advance, 'A', t, "advance to a")
-	expectRune(s.Advance, 'B', t, "advance to b")
+	expectRune(s, s.Advance, 'A', t, "advance to a")
+	expectRune(s, s.Advance, 'B', t, "advance to b")
 
 	// Retreat once.
-	expectRune(s.Retreat, 'A', t, "retreat back to a")
+	expectRune(s, s.Retreat, 'A', t, "retreat back to a")
 
 	// Expect an empty rune because we're right back at the start of the stream.
 	_, err := s.Retreat()
@@ -190,8 +190,11 @@ func TestStreamCollect(t *testing.T) {
 	s.Advance() // C
 
 	abc := s.Collect()
+	if s.Index() != 2 {
+		t.Errorf("Expected position 2, but got %d", s.Index())
+	}
 	if abc != "ABC" {
-		t.Errorf("Expected to collect 'ABC', but got '%v'", abc)
+		t.Errorf("Expected to collect 'ABC', but got '%v'. Stream was %v", abc, s)
 	}
 
 	s.Advance() // D
@@ -200,7 +203,36 @@ func TestStreamCollect(t *testing.T) {
 	s.Advance() // G
 
 	defg := s.Collect()
+	if s.Index() != 6 {
+		t.Errorf("Expected position 6, but got %d", s.Index())
+	}
 	if defg != "DEFG" {
 		t.Errorf("Expected to collect 'DEFG', but got '%v'", defg)
+	}
+}
+
+func TestStreamAdvanceCollectRetreat(t *testing.T) {
+	s := NewFromString("words", "ABCDEFG")
+
+	expectRune(s, s.Advance, 'A', t, "1")
+	expectRune(s, s.Advance, 'B', t, "2")
+	expectRune(s, s.Advance, 'C', t, "3")
+
+	expectRune(s, s.Retreat, 'B', t, "4")
+
+	ab := s.Collect()
+	if ab != "AB" {
+		t.Errorf("Expected to collect 'AB', but got '%v'", ab)
+	}
+
+	expectRune(s, s.Advance, 'C', t, "5")
+	expectRune(s, s.Advance, 'D', t, "6")
+	s.Advance() // E
+	s.Advance() // F
+
+	cdef := s.Collect()
+	if cdef != "CDEF" {
+		t.Errorf("Expected to collect 'CDEF', but got '%v'", cdef)
+		t.Error(s)
 	}
 }

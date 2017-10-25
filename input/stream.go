@@ -16,9 +16,6 @@ type Stream struct {
 	// Buffer is the space currently being searched for tokens to avoid seeking the input stream.
 	// When a token match is found, the buffer is emptied.
 	Buffer []rune
-	// readUntil is the furthest point in the input we've read to. If this is ahead of Current, then we
-	// have data in the Buffer which can be read.
-	readUntil int64
 	// Start represents the start position of the lexer against the Input, e.g.
 	// if we've lexed 124 runes already, that's where we're starting from.
 	Start int64
@@ -39,12 +36,12 @@ func (l *Stream) String() string {
 // New creates a new parser input from a buffered reader.
 func New(name string, input *bufio.Reader) *Stream {
 	return &Stream{
-		Name:      name,
-		Input:     input,
-		Buffer:    make([]rune, 0),
-		Current:   -1,
-		readUntil: -1,
-		position:  NewPosition(1, 0),
+		Name:     name,
+		Input:    input,
+		Buffer:   make([]rune, 0),
+		Current:  -1,
+		Start:    -1,
+		position: NewPosition(1, 0),
 	}
 }
 
@@ -60,7 +57,7 @@ func NewFromString(name string, input string) *Stream {
 func (l *Stream) Collect() string {
 	// Emit the token and update the position of the lexer against the input stream.
 	// Returning the item helps with unit testing.
-	length := int(l.Current - l.Start + 1)
+	length := int(l.Current - l.Start)
 	left := getLeft(l.Buffer, length)
 	right := getRight(l.Buffer, length)
 	l.Start = l.Current
@@ -85,17 +82,18 @@ func getRight(runes []rune, start int) []rune {
 // Advance reads a rune from the Input and sets the current position.
 func (l *Stream) Advance() (rune, error) {
 	// Check to see whether we already have it in the buffer, if so, read it from there.
-	if l.Current+1 <= l.readUntil {
-		l.Current++
-		l.CurrentRune = l.Buffer[l.Current-l.Start]
+	l.Current++
+
+	bufferIndex := int(l.Current - l.Start - 1)
+	if bufferIndex > -1 && bufferIndex < len(l.Buffer) {
+		// We can read from the buffer.
+		l.CurrentRune = l.Buffer[bufferIndex]
 		l.position.Advance(l.CurrentRune)
 		return l.CurrentRune, nil
 	}
 
 	r, _, err := l.Input.ReadRune()
 	l.Buffer = append(l.Buffer, r)
-	l.Current++
-	l.readUntil = l.Current
 	l.CurrentRune = r
 	l.position.Advance(l.CurrentRune)
 	return r, err
@@ -128,7 +126,8 @@ func (l *Stream) Retreat() (rune, error) {
 		return 0x0, ErrStartOfFile
 	}
 	l.Current = newPos
-	l.CurrentRune = l.Buffer[l.Current-l.Start]
+	bufferIndex := int(l.Current - l.Start - 1)
+	l.CurrentRune = l.Buffer[bufferIndex]
 	l.position.Retreat(l.CurrentRune)
 	return l.CurrentRune, nil
 }
