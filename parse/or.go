@@ -9,5 +9,5 @@ func Or(pi Input, functions ...Function) Result {
 			return r
 		}
 	}
-	return Failure("Or", nil)
+	return Failure("or", nil)
 }

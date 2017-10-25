@@ -11,7 +11,7 @@ func AnyRuneIn(pi Input, in string) Result {
 	pr, err := pi.Peek()
 	if strings.ContainsRune(in, pr) {
 		_, err = pi.Advance()
-		return Success(name, pr, nil, err)
+		return Success(name, pr, err)
 	}
 	return Failure(name, err)
 }

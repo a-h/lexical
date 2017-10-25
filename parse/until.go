@@ -11,7 +11,7 @@ func StringUntil(pi Input, delimiter Function) Result {
 	for {
 		ds := delimiter(pi)
 		if ds.Success {
-			return Success(name, string(buf.Bytes()), nil, ds.Error)
+			return Success(name, string(buf.Bytes()), ds.Error)
 		}
 		r, err := pi.Advance()
 		if err != nil {

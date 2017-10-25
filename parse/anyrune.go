@@ -5,5 +5,5 @@ func AnyRune(pi Input) Result {
 	if err != nil {
 		return Failure("any rune", err)
 	}
-	return Success("any rune", r, nil, err)
+	return Success("any rune", r, err)
 }

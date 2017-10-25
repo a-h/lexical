@@ -17,7 +17,7 @@ func String(pi Input, s string) Result {
 		pi.Advance()
 		advancedBy++
 	}
-	return Success(name, s, nil, nil)
+	return Success(name, s, nil)
 }
 
 func rewind(pi Input, times int) (err error) {

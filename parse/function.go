@@ -28,16 +28,14 @@ type Result struct {
 	Name    string
 	Success bool
 	Item    interface{}
-	Next    Function
 	Error   error
 }
 
-func Success(name string, item interface{}, next Function, err error) Result {
+func Success(name string, item interface{}, err error) Result {
 	return Result{
 		Name:    name,
 		Success: true,
 		Item:    item,
-		Next:    next,
 		Error:   err,
 	}
 }

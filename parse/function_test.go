@@ -45,7 +45,7 @@ func TestResultString(t *testing.T) {
 		expected string
 	}{
 		{
-			input:    Success("a", 123, nil, nil),
+			input:    Success("a", 123, nil),
 			expected: "✓ (a) 123",
 		},
 		{
@@ -53,7 +53,7 @@ func TestResultString(t *testing.T) {
 			expected: "✗ (a) err: <nil>",
 		},
 		{
-			input:    Success("a", "Don't forget your lucky number.", nil, nil),
+			input:    Success("a", "Don't forget your lucky number.", nil),
 			expected: "✓ (a) Don't forg...",
 		},
 		{
@@ -61,7 +61,7 @@ func TestResultString(t *testing.T) {
 			expected: "✗ (a) err: EOF",
 		},
 		{
-			input:    Success("a", 123, nil, io.EOF),
+			input:    Success("a", 123, io.EOF),
 			expected: "✓ (a) 123\n✓ (a) err: EOF",
 		},
 	}

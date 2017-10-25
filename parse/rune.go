@@ -8,7 +8,7 @@ func Rune(pi Input, r rune) Result {
 	pr, err := pi.Peek()
 	if pr == r {
 		_, err = pi.Advance()
-		return Success(name, pr, nil, err)
+		return Success(name, pr, err)
 	}
 	return Failure(name, fmt.Errorf("Expected '%v', but got '%v'", r, pr))
 }
