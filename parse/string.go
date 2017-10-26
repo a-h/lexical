@@ -4,7 +4,14 @@ import (
 	"fmt"
 )
 
-func String(pi Input, s string) Result {
+// String captures a specific string.
+func String(s string) Function {
+	return func(pi Input) Result {
+		return parseString(pi, s)
+	}
+}
+
+func parseString(pi Input, s string) Result {
 	name := fmt.Sprintf("string: '%v'", s)
 
 	advancedBy := 0

@@ -6,7 +6,7 @@ import (
 	"github.com/a-h/lexical/input"
 )
 
-func TestInOrder(t *testing.T) {
+func TestAll(t *testing.T) {
 	tests := []struct {
 		name             string
 		parsers          []Function
@@ -15,31 +15,22 @@ func TestInOrder(t *testing.T) {
 		expectedPosition int64
 	}{
 		{
-			name: "A then B - success",
-			parsers: []Function{
-				func(pi Input) Result { return Rune(pi, 'A') },
-				func(pi Input) Result { return Rune(pi, 'B') },
-			},
+			name:             "A then B - success",
+			parsers:          []Function{Rune('A'), Rune('B')},
 			input:            "AB",
 			expected:         true,
 			expectedPosition: 2,
 		},
 		{
-			name: "A then B - failure",
-			parsers: []Function{
-				func(pi Input) Result { return Rune(pi, 'A') },
-				func(pi Input) Result { return Rune(pi, 'B') },
-			},
+			name:             "A then B - failure",
+			parsers:          []Function{Rune('A'), Rune('B')},
 			input:            "AC",
 			expected:         false,
 			expectedPosition: 0,
 		},
 		{
-			name: "Any two runes",
-			parsers: []Function{
-				func(pi Input) Result { return AnyRune(pi) },
-				func(pi Input) Result { return AnyRune(pi) },
-			},
+			name:             "Any two runes",
+			parsers:          []Function{AnyRune(), AnyRune()},
 			input:            "ZC",
 			expected:         true,
 			expectedPosition: 2,
@@ -48,7 +39,8 @@ func TestInOrder(t *testing.T) {
 
 	for _, test := range tests {
 		pi := input.NewFromString(test.name, test.input)
-		result := InOrder(pi, test.parsers...)
+		parser := All(ConcatenateStringsCombiner, test.parsers...)
+		result := parser(pi)
 		actual := result.Success
 		if actual != test.expected {
 			t.Errorf("test %v: for input '%v' expected %v but got %v", test.name, test.input, test.expected, actual)

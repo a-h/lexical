@@ -27,7 +27,8 @@ func TestAnyRune(t *testing.T) {
 
 	for i, test := range tests {
 		pi := input.NewFromString(fmt.Sprintf("test %d", i), test.input)
-		result := AnyRune(pi)
+		parser := AnyRune()
+		result := parser(pi)
 		actual := result.Success
 		if actual != test.expected {
 			t.Errorf("test %v: for input '%v' expected %v but got %v", i, test.input, test.expected, actual)

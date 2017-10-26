@@ -39,7 +39,8 @@ func TestString(t *testing.T) {
 
 	for i, test := range tests {
 		pi := input.NewFromString(fmt.Sprintf("test %d", i), test.input)
-		result := String(pi, test.s)
+		parser := String(test.s)
+		result := parser(pi)
 		actual := result.Success
 		if actual != test.expected {
 			t.Errorf("test %v: for input '%v' expected %v but got %v", i, test.input, test.expected, actual)

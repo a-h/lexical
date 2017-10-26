@@ -7,6 +7,7 @@ import (
 	"github.com/a-h/lexical/parse"
 )
 
+// Scanner can take an input stream and execute parse results.
 type Scanner struct {
 	Input  parse.Input
 	Parser parse.Function
@@ -17,13 +18,8 @@ func (s *Scanner) Next() parse.Result {
 	success := result.Success
 	if !success && result.Error != io.EOF {
 		line, col := s.Input.Position()
-		result.Error = fmt.Errorf("scanner: unmatched at line %v, column %v", line, col)
+		result.Error = fmt.Errorf("scanner: unmatched at line %v, column %v, item: %v", line, col, result)
 	}
-	if result.Error != io.EOF && result.Next == nil {
-		line, col := s.Input.Position()
-		result.Error = fmt.Errorf("scanner: not at end of file, but have finished parsing at line %v, column %v", line, col)
-	}
-	s.Parser = result.Next
 	s.Input.Collect()
 	return result
 }

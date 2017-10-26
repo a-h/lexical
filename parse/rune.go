@@ -2,7 +2,14 @@ package parse
 
 import "fmt"
 
-func Rune(pi Input, r rune) Result {
+// Rune captures a single, specified rune.
+func Rune(r rune) Function {
+	return func(pi Input) Result {
+		return parseRune(pi, r)
+	}
+}
+
+func parseRune(pi Input, r rune) Result {
 	name := fmt.Sprintf("rune '%v'", r)
 
 	pr, err := pi.Peek()
@@ -10,5 +17,5 @@ func Rune(pi Input, r rune) Result {
 		_, err = pi.Advance()
 		return Success(name, pr, err)
 	}
-	return Failure(name, fmt.Errorf("Expected '%v', but got '%v'", r, pr))
+	return Failure(name, fmt.Errorf("Expected '%v', but got '%v' with error %v", string(r), string(pr), err))
 }

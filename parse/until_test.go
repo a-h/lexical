@@ -35,17 +35,18 @@ func TestStringUntil(t *testing.T) {
 		{
 			input:           "this is a test",
 			s:               ">",
-			expected:        false,
+			expected:        true,
 			expectedCapture: "this is a test",
 		},
 	}
 
 	for i, test := range tests {
+		parser := StringUntil(String(test.s))
 		pi := input.NewFromString(fmt.Sprintf("test %d", i), test.input)
-		result := StringUntil(pi, func(ppi Input) Result { return String(ppi, test.s) })
+		result := parser(pi)
 		actual := result.Success
 		if actual != test.expected {
-			t.Errorf("test %v: for input '%v' expected %v but got %v", i, test.input, test.expected, actual)
+			t.Errorf("test %v: for input '%v' expected %v but got %v, catpured '%v'", i, test.input, test.expected, actual, result.Item)
 		}
 	}
 }

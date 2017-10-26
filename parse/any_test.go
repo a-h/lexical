@@ -16,22 +16,22 @@ func TestOr(t *testing.T) {
 	}{
 		{
 			name:     "'A' or 'a'",
-			a:        func(pi Input) Result { return AnyRuneIn(pi, "A") },
-			b:        func(pi Input) Result { return AnyRuneIn(pi, "a") },
+			a:        Rune('A'),
+			b:        Rune('a'),
 			input:    "A",
 			expected: true,
 		},
 		{
 			name:     "'A' or 'a'",
-			a:        func(pi Input) Result { return AnyRuneIn(pi, "A") },
-			b:        func(pi Input) Result { return AnyRuneIn(pi, "a") },
+			a:        Rune('A'),
+			b:        Rune('a'),
 			input:    "a",
 			expected: true,
 		},
 		{
 			name:     "'A' or 'a'",
-			a:        func(pi Input) Result { return AnyRuneIn(pi, "A") },
-			b:        func(pi Input) Result { return AnyRuneIn(pi, "a") },
+			a:        Rune('A'),
+			b:        Rune('a'),
 			input:    "c",
 			expected: false,
 		},
@@ -39,7 +39,8 @@ func TestOr(t *testing.T) {
 
 	for _, test := range tests {
 		pi := input.NewFromString(test.name, test.input)
-		result := Or(pi, test.a, test.b)
+		parser := Or(test.a, test.b)
+		result := parser(pi)
 		actual := result.Success
 		if actual != test.expected {
 			t.Errorf("test %v: for input '%v' expected %v but got %v", test.name, test.input, test.expected, actual)

@@ -8,7 +8,7 @@ import (
 	"github.com/a-h/lexical/input"
 )
 
-func TestAnyRuneIn(t *testing.T) {
+func TestRuneIn(t *testing.T) {
 	tests := []struct {
 		input         string
 		in            string
@@ -45,7 +45,8 @@ func TestAnyRuneIn(t *testing.T) {
 
 	for i, test := range tests {
 		pi := input.NewFromString(fmt.Sprintf("test %d", i), test.input)
-		result := AnyRuneIn(pi, test.in)
+		parser := RuneIn(test.in)
+		result := parser(pi)
 		actual := result.Success
 		if actual != test.expected {
 			t.Errorf("test %v: for input '%v' expected %v but got %v", i, test.input, test.expected, actual)

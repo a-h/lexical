@@ -31,6 +31,7 @@ type Result struct {
 	Error   error
 }
 
+// Success creates a successful result of a parse operation.
 func Success(name string, item interface{}, err error) Result {
 	return Result{
 		Name:    name,
@@ -40,6 +41,7 @@ func Success(name string, item interface{}, err error) Result {
 	}
 }
 
+// Failure creates an unsuccessful result of a parse operation.
 func Failure(name string, err error) Result {
 	return Result{
 		Name:    name,
@@ -48,6 +50,7 @@ func Failure(name string, err error) Result {
 	}
 }
 
+// Eq compares two results for equality.
 func (result Result) Eq(cmp Result) bool {
 	if cmp.Name != result.Name {
 		return false

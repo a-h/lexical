@@ -2,50 +2,50 @@ package scanner
 
 import (
 	"fmt"
-	"strings"
+	"io"
 	"testing"
 
 	"github.com/a-h/lexical/input"
 	"github.com/a-h/lexical/parse"
 )
 
-func any(pi parse.Input) parse.Result {
-	_, err := pi.Advance()
-	s := pi.Collect()
-	return parse.Success("any", s, any, err)
-}
-
-func uppercase(pi parse.Input) parse.Result {
-	allowed := "ABCDEFGHIJKLMNOPQRSTUVXYZ"
-	pr, err := pi.Peek()
-	if strings.ContainsRune(allowed, pr) {
-		_, err = pi.Advance()
-		value := pi.Collect()
-		return parse.Success("uppercase", value, uppercase, err)
-	}
-	return parse.Failure("uppercase", fmt.Errorf("Expected A-Z, but got '%v'", pr))
-}
-
 func TestScanning(t *testing.T) {
-	stream := input.NewFromString("Scanner Input", "ABCDEFG")
+	stream := input.NewFromString("Scanner Input", `<a>Example</a>`)
 
-	scanner := New(stream, any)
+	scanner := New(stream, xmlTokens)
 	var err error
 	for {
 		result := scanner.Next()
 		if result.Error != nil {
+			err = result.Error
 			break
 		}
-		fmt.Println(result)
+		fmt.Printf("Result: %v\n", result)
+		stream.Collect()
 	}
-	if err != nil {
+	if err != nil && err != io.EOF {
 		t.Error(err)
 	}
 }
 
-func xmlElement(pi parse.Input) parse.Result {
-	parse.Rune(pi, '<')
-	_, err := pi.Advance()
-	s := pi.Collect()
-	return parse.Success("any", s, any, err)
+var xmlTokens = parse.Any(xmlOpenElement, xmlText, xmlCloseElement)
+
+var combineTagAndContents parse.ResultCombiner = func(openTag interface{}, tagContents interface{}) interface{} {
+	return "name: " + fmt.Sprintf("%v", tagContents)
 }
+
+var xmlOpenElement = parse.Then(
+	parse.Rune('<'),
+	parse.StringUntil(parse.Rune('>')),
+	combineTagAndContents,
+)
+
+var xmlText = parse.StringUntil(parse.Rune('<'))
+
+var xmlCloseElement = parse.All(
+	parse.ConcatenateStringsCombiner,
+	parse.Rune('<'),
+	parse.Rune('/'),
+	parse.StringUntil(parse.Rune('>')),
+	parse.Rune('>'),
+)
