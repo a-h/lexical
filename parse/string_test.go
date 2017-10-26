@@ -46,9 +46,7 @@ func TestString(t *testing.T) {
 		}
 		var expectedPosition int64
 		if test.expected {
-			expectedPosition = int64(len(test.input) - 1)
-		} else {
-			expectedPosition = -1
+			expectedPosition = int64(len(test.input))
 		}
 		if pi.Current != expectedPosition {
 			t.Errorf("test %v: for input '%v' expected to be at position %v but was at %v", i, test.input, expectedPosition, pi.Current)

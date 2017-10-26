@@ -39,8 +39,6 @@ func New(name string, input *bufio.Reader) *Stream {
 		Name:     name,
 		Input:    input,
 		Buffer:   make([]rune, 0),
-		Current:  -1,
-		Start:    -1,
 		position: NewPosition(1, 0),
 	}
 }
@@ -79,21 +77,29 @@ func getRight(runes []rune, start int) []rune {
 	return runes[start:]
 }
 
+func fromBuffer(startOfBufferIndex int64, currentIndex int64, buffer []rune) (r rune, ok bool) {
+	index := int(currentIndex-startOfBufferIndex) - 1
+	if index < 0 {
+		// Can't read before the buffer.
+		return 0x0, false
+	}
+	if index >= len(buffer) {
+		return 0x0, false
+	}
+	return buffer[index], true
+}
+
 // Advance reads a rune from the Input and sets the current position.
-func (l *Stream) Advance() (rune, error) {
+func (l *Stream) Advance() (r rune, err error) {
 	// Check to see whether we already have it in the buffer, if so, read it from there.
 	l.Current++
 
-	bufferIndex := int(l.Current - l.Start - 1)
-	if bufferIndex > -1 && bufferIndex < len(l.Buffer) {
-		// We can read from the buffer.
-		l.CurrentRune = l.Buffer[bufferIndex]
-		l.position.Advance(l.CurrentRune)
-		return l.CurrentRune, nil
+	r, ok := fromBuffer(l.Start, l.Current, l.Buffer)
+	if !ok {
+		r, _, err = l.Input.ReadRune()
+		l.Buffer = append(l.Buffer, r)
 	}
 
-	r, _, err := l.Input.ReadRune()
-	l.Buffer = append(l.Buffer, r)
 	l.CurrentRune = r
 	l.position.Advance(l.CurrentRune)
 	return r, err
@@ -117,19 +123,19 @@ func (l *Stream) Peek() (rune, error) {
 var ErrStartOfFile = errors.New("SOF")
 
 // Retreat steps back a rune.
-func (l *Stream) Retreat() (rune, error) {
-	newPos := l.Current - 1
-	if newPos <= -1 {
-		l.Current = -1
+func (l *Stream) Retreat() (r rune, err error) {
+	l.Current--
+
+	r, ok := fromBuffer(l.Start, l.Current, l.Buffer)
+	if !ok {
 		l.CurrentRune = 0x0
 		l.position.Retreat(l.CurrentRune)
 		return 0x0, ErrStartOfFile
 	}
-	l.Current = newPos
-	bufferIndex := int(l.Current - l.Start - 1)
-	l.CurrentRune = l.Buffer[bufferIndex]
+
+	l.CurrentRune = r
 	l.position.Retreat(l.CurrentRune)
-	return l.CurrentRune, nil
+	return r, err
 }
 
 // Position returns the current position within the stream.

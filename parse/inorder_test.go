@@ -22,7 +22,7 @@ func TestInOrder(t *testing.T) {
 			},
 			input:            "AB",
 			expected:         true,
-			expectedPosition: 1,
+			expectedPosition: 2,
 		},
 		{
 			name: "A then B - failure",
@@ -32,7 +32,7 @@ func TestInOrder(t *testing.T) {
 			},
 			input:            "AC",
 			expected:         false,
-			expectedPosition: -1,
+			expectedPosition: 0,
 		},
 		{
 			name: "Any two runes",
@@ -42,7 +42,7 @@ func TestInOrder(t *testing.T) {
 			},
 			input:            "ZC",
 			expected:         true,
-			expectedPosition: 1,
+			expectedPosition: 2,
 		},
 	}
 

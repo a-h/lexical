@@ -45,8 +45,8 @@ func TestOr(t *testing.T) {
 			t.Errorf("test %v: for input '%v' expected %v but got %v", test.name, test.input, test.expected, actual)
 		}
 		var expectedPosition int64
-		if !test.expected {
-			expectedPosition = -1
+		if test.expected {
+			expectedPosition = 1
 		}
 		if pi.Current != expectedPosition {
 			t.Errorf("test %v: for input '%v' expected to be at position %v but was at %v", test.name, test.input, expectedPosition, pi.Current)

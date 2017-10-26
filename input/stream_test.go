@@ -190,8 +190,8 @@ func TestStreamCollect(t *testing.T) {
 	s.Advance() // C
 
 	abc := s.Collect()
-	if s.Index() != 2 {
-		t.Errorf("Expected position 2, but got %d", s.Index())
+	if s.Index() != 3 {
+		t.Errorf("Expected position 3, but got %d", s.Index())
 	}
 	if abc != "ABC" {
 		t.Errorf("Expected to collect 'ABC', but got '%v'. Stream was %v", abc, s)
@@ -203,8 +203,8 @@ func TestStreamCollect(t *testing.T) {
 	s.Advance() // G
 
 	defg := s.Collect()
-	if s.Index() != 6 {
-		t.Errorf("Expected position 6, but got %d", s.Index())
+	if s.Index() != 7 {
+		t.Errorf("Expected position 7, but got %d", s.Index())
 	}
 	if defg != "DEFG" {
 		t.Errorf("Expected to collect 'DEFG', but got '%v'", defg)
