@@ -9,8 +9,6 @@ import (
 
 // Stream defines a lexical scanner over a stream.
 type Stream struct {
-	// Name is used for error reports.
-	Name string
 	// Input holds the Reader being scanned.
 	Input *bufio.Reader
 	// Buffer is the space currently being searched for tokens to avoid seeking the input stream.
@@ -30,13 +28,12 @@ type Stream struct {
 }
 
 func (l *Stream) String() string {
-	return fmt.Sprintf("%v: Current Rune: '%v', Start of Token Position: %v, Current Position: %v, Forward Buffer Size: %v, Current Buffer: '%v'", l.Name, string(l.CurrentRune), l.Start, l.Current, len(l.Buffer), string(l.Buffer))
+	return fmt.Sprintf("Current Rune: '%v', Start of Token Position: %v, Current Position: %v, Forward Buffer Size: %v, Current Buffer: '%v'", string(l.CurrentRune), l.Start, l.Current, len(l.Buffer), string(l.Buffer))
 }
 
 // New creates a new parser input from a buffered reader.
-func New(name string, input *bufio.Reader) *Stream {
+func New(input *bufio.Reader) *Stream {
 	return &Stream{
-		Name:     name,
 		Input:    input,
 		Buffer:   make([]rune, 0),
 		position: NewPosition(1, 0),
@@ -44,10 +41,10 @@ func New(name string, input *bufio.Reader) *Stream {
 }
 
 // NewFromString creates a new parser input from an input string.
-func NewFromString(name string, input string) *Stream {
+func NewFromString(input string) *Stream {
 	bs := bytes.NewBufferString(input)
 	sr := bufio.NewReader(bs)
-	return New(name, sr)
+	return New(sr)
 }
 
 // Collect returns the value of the consumed buffer and updates the position of the stream to the current

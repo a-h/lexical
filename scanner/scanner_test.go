@@ -12,7 +12,7 @@ import (
 )
 
 func TestScanning(t *testing.T) {
-	stream := input.NewFromString("Scanner Input", `<a>Example</a>`)
+	stream := input.NewFromString(`<a>Example</a>`)
 
 	scanner := New(stream, xmlTokens)
 	var err error
@@ -73,14 +73,14 @@ func TestXMLName(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		pi := input.NewFromString(fmt.Sprintf("%v", i), test.input)
+		pi := input.NewFromString(test.input)
 		result := xmlName(pi)
 		actual := result.Success
 		if actual != test.expected {
-			t.Errorf("test %v: for input '%v' expected %v but got %v", pi.Name, test.input, test.expected, actual)
+			t.Errorf("test %v: for input '%v' expected %v but got %v", i, test.input, test.expected, actual)
 		}
 		if test.expected && result.Item != test.expectedItem {
-			t.Errorf("test %v: for input '%v' expected item '%v' but got '%v' (%v)", pi.Name, test.input, test.expectedItem, result.Item, reflect.TypeOf(result.Item))
+			t.Errorf("test %v: for input '%v' expected item '%v' but got '%v' (%v)", i, test.input, test.expectedItem, result.Item, reflect.TypeOf(result.Item))
 		}
 	}
 }

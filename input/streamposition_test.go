@@ -1,8 +1,6 @@
 package input
 
 import (
-	"bufio"
-	"bytes"
 	"testing"
 )
 
@@ -73,7 +71,7 @@ func TestStreamPositionAdvance(t *testing.T) {
 	advanceOperation := func(s *Stream) (rune, error) { return s.Advance() }
 
 	for _, test := range tests {
-		actual := testPosition(test.name, test.input, 0, advanceOperation, t)
+		actual := testPosition(test.input, 0, advanceOperation, t)
 
 		if len(test.expected) != len(actual) {
 			t.Errorf("name: '%s': expected %d positions, but got %d positions", test.name, len(test.expected), len(actual))
@@ -90,13 +88,10 @@ func TestStreamPositionAdvance(t *testing.T) {
 }
 
 // testPosition tests applies the operation to the Stream and checks the results. The advanceCount does some inital setup on the Stream.
-func testPosition(name string, input string, advanceCount int, operation func(stream *Stream) (rune, error), t *testing.T) []Position {
-	bs := bytes.NewBufferString(input)
-	sr := bufio.NewReader(bs)
-
+func testPosition(input string, advanceCount int, operation func(stream *Stream) (rune, error), t *testing.T) []Position {
 	actual := make([]Position, 0)
 
-	s := New(name, sr)
+	s := NewFromString(input)
 
 	for i := 0; i < advanceCount; i++ {
 		s.Advance()
@@ -178,7 +173,7 @@ func TestStreamPositionRetreat(t *testing.T) {
 	retreatOperation := func(s *Stream) (rune, error) { return s.Retreat() }
 
 	for _, test := range tests {
-		actual := testPosition(test.name, test.input, len(test.input)+1, retreatOperation, t)
+		actual := testPosition(test.input, len(test.input)+1, retreatOperation, t)
 
 		if len(test.expected) != len(actual) {
 			t.Errorf("name: '%s': expected %d positions, but got %d positions", test.name, len(test.expected), len(actual))
@@ -196,9 +191,7 @@ func TestStreamPositionRetreat(t *testing.T) {
 }
 
 func TestStreamPositionFunction(t *testing.T) {
-	bs := bytes.NewBufferString("abc\n123")
-	sr := bufio.NewReader(bs)
-	s := New("Stream Position", sr)
+	s := NewFromString("abc\n123")
 
 	line, col := s.Position()
 	if line != 1 && col != 1 {

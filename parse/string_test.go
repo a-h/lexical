@@ -1,7 +1,6 @@
 package parse
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/a-h/lexical/input"
@@ -38,7 +37,7 @@ func TestString(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		pi := input.NewFromString(fmt.Sprintf("test %d", i), test.input)
+		pi := input.NewFromString(test.input)
 		parser := String(test.s)
 		result := parser(pi)
 		actual := result.Success

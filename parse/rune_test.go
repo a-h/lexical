@@ -1,7 +1,6 @@
 package parse
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/a-h/lexical/input"
@@ -26,7 +25,7 @@ func TestRune(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		pi := input.NewFromString(fmt.Sprintf("test %d", i), test.input)
+		pi := input.NewFromString(test.input)
 		parser := Rune(test.r)
 		result := parser(pi)
 		actual := result.Success

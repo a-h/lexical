@@ -1,7 +1,6 @@
 package parse
 
 import (
-	"fmt"
 	"io"
 	"testing"
 
@@ -44,7 +43,7 @@ func TestRuneIn(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		pi := input.NewFromString(fmt.Sprintf("test %d", i), test.input)
+		pi := input.NewFromString(test.input)
 		parser := RuneIn(test.in)
 		result := parser(pi)
 		actual := result.Success

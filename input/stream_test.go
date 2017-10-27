@@ -17,7 +17,7 @@ func TestStreamAdvance(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		s := NewFromString("Advance Test", test.input)
+		s := NewFromString(test.input)
 
 		for i, er := range test.input {
 			ar, err := s.Advance()
@@ -42,7 +42,7 @@ func expectRune(s *Stream, test func() (rune, error), expected rune, t *testing.
 }
 
 func TestStreamRetreat(t *testing.T) {
-	s := NewFromString("Retreat Test", "ABCDEFG")
+	s := NewFromString("ABCDEFG")
 
 	expectRune(s, s.Advance, 'A', t, "1")
 	expectRune(s, s.Advance, 'B', t, "2")
@@ -60,7 +60,7 @@ func TestStreamRetreat(t *testing.T) {
 }
 
 func TestStreamAdvanceRetreat_UTF8(t *testing.T) {
-	s := NewFromString("words", "你叫什么name？")
+	s := NewFromString("你叫什么name？")
 
 	expectRune(s, s.Advance, '你', t, "1")
 	expectRune(s, s.Advance, '叫', t, "2")
@@ -83,7 +83,7 @@ func TestStreamAdvanceRetreat_UTF8(t *testing.T) {
 }
 
 func TestStreamRetreat_CannotReadBeforeStartOfStream(t *testing.T) {
-	s := NewFromString("words", "ABCDEFG")
+	s := NewFromString("ABCDEFG")
 
 	// Read the first two runes.
 	expectRune(s, s.Advance, 'A', t, "advance to a")
@@ -163,7 +163,7 @@ func TestStreamLeftAndRight(t *testing.T) {
 }
 
 func TestStreamPeek(t *testing.T) {
-	s := NewFromString("words", "ABCDEFG")
+	s := NewFromString("ABCDEFG")
 
 	startPosition := s.Current
 	startRune := s.CurrentRune
@@ -183,7 +183,7 @@ func TestStreamPeek(t *testing.T) {
 }
 
 func TestStreamCollect(t *testing.T) {
-	s := NewFromString("words", "ABCDEFG")
+	s := NewFromString("ABCDEFG")
 
 	s.Advance() // A
 	s.Advance() // B
@@ -212,7 +212,7 @@ func TestStreamCollect(t *testing.T) {
 }
 
 func TestStreamAdvanceCollectRetreat(t *testing.T) {
-	s := NewFromString("words", "ABCDEFG")
+	s := NewFromString("ABCDEFG")
 
 	expectRune(s, s.Advance, 'A', t, "1")
 	expectRune(s, s.Advance, 'B', t, "2")

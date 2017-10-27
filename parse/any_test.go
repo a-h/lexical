@@ -38,7 +38,7 @@ func TestOr(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		pi := input.NewFromString(test.name, test.input)
+		pi := input.NewFromString(test.input)
 		parser := Or(test.a, test.b)
 		result := parser(pi)
 		actual := result.Success

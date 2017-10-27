@@ -30,7 +30,7 @@ func TestDateParsing(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		ip := input.NewFromString("date_test", test.input)
+		ip := input.NewFromString(test.input)
 		result := date(ip)
 		if result.Success != test.expectedMatch {
 			t.Errorf("for input '%v', expected sucess %v, but was %v", test.input, test.expectedMatch, result.Success)

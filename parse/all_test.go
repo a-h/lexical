@@ -41,7 +41,7 @@ func TestAll(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		pi := input.NewFromString(test.name, test.input)
+		pi := input.NewFromString(test.input)
 		parser := All(WithStringConcatCombiner, test.parsers...)
 		result := parser(pi)
 		actual := result.Success

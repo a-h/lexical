@@ -21,6 +21,14 @@ func TestURLParsing(t *testing.T) {
 			},
 		},
 		{
+			input:         "example.co.uk/",
+			expectedMatch: true,
+			expectedValue: URL{
+				Host: "example.co.uk",
+				Path: "/",
+			},
+		},
+		{
 			input:         "example.com:80/path",
 			expectedMatch: true,
 			expectedValue: URL{
@@ -31,7 +39,7 @@ func TestURLParsing(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		ip := input.NewFromString("url_test", test.input)
+		ip := input.NewFromString(test.input)
 		result := url(ip)
 		if result.Success != test.expectedMatch {
 			t.Errorf("for input '%v', expected success '%v', but was %v", test.input, test.expectedMatch, result.Success)
