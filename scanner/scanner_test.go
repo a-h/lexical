@@ -17,12 +17,11 @@ func TestScanning(t *testing.T) {
 	scanner := New(stream, xmlTokens)
 	var err error
 	for {
-		result := scanner.Next()
-		if result.Error != nil {
-			err = result.Error
+		item, err := scanner.Next()
+		fmt.Println(item)
+		if err != nil {
 			break
 		}
-		stream.Collect()
 	}
 	if err != nil && err != io.EOF {
 		t.Error(err)
@@ -39,9 +38,9 @@ var combineTagAndContents parse.MultipleResultCombiner = func(results []interfac
 var letterOrDigit = parse.RuneInRanges(unicode.Letter, unicode.Number)
 
 var xmlName = parse.Then(
+	parse.WithStringConcatCombiner,
 	parse.RuneWhere(unicode.IsLetter),
-	parse.Many(letterOrDigit, parse.ConcatenateToStringCombiner, 0, 500),
-	parse.ConcatenateToStringCombiner,
+	parse.Many(parse.WithStringConcatCombiner, 0, 500, letterOrDigit),
 )
 
 var xmlOpenElement = parse.All(
@@ -54,7 +53,7 @@ var xmlOpenElement = parse.All(
 var xmlText = parse.StringUntil(parse.Rune('<'))
 
 var xmlCloseElement = parse.All(
-	parse.ConcatenateToStringCombiner,
+	parse.WithStringConcatCombiner,
 	parse.Rune('<'),
 	parse.Rune('/'),
 	parse.StringUntil(parse.Rune('>')),

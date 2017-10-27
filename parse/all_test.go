@@ -42,7 +42,7 @@ func TestAll(t *testing.T) {
 
 	for _, test := range tests {
 		pi := input.NewFromString(test.name, test.input)
-		parser := All(ConcatenateToStringCombiner, test.parsers...)
+		parser := All(WithStringConcatCombiner, test.parsers...)
 		result := parser(pi)
 		actual := result.Success
 		if actual != test.expected {
@@ -57,7 +57,7 @@ func TestAll(t *testing.T) {
 	}
 }
 
-func TestConcatenateToStringCombiner(t *testing.T) {
+func TestWithStringConcatCombiner(t *testing.T) {
 	inputs := []interface{}{
 		'A',
 		"BCD",
@@ -65,7 +65,7 @@ func TestConcatenateToStringCombiner(t *testing.T) {
 		1,
 		2.0,
 	}
-	result, _ := ConcatenateToStringCombiner(inputs)
+	result, _ := WithStringConcatCombiner(inputs)
 	if result != "ABCDE12" {
 		t.Errorf("Expected 'ABCDE12.0', but got '%v'", result)
 	}

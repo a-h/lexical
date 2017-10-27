@@ -38,8 +38,15 @@ func runeWhere(pi Input, name string, predicate func(r rune) bool) Result {
 	return Failure(name, err)
 }
 
+// RuneInRanges returns a parser which accepts a rune within the specified Unicode range.
 func RuneInRanges(rts ...*unicode.RangeTable) Function {
 	return func(pi Input) Result {
 		return runeWhere(pi, "rune in ranges", func(r rune) bool { return unicode.IsOneOf(rts, r) })
 	}
 }
+
+// Letter returns a parser which accepts a rune within the Letter Unicode range.
+var Letter = RuneInRanges(unicode.Letter)
+
+// ZeroToNine returns a parser which accepts a rune within range, i.e. 0-9.
+var ZeroToNine = RuneIn("0123456789")

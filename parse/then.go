@@ -3,13 +3,13 @@ package parse
 import "errors"
 
 // Then executes one function, then another, comining the results using the provided function.
-func Then(a, b Function, combiner MultipleResultCombiner) Function {
+func Then(combiner MultipleResultCombiner, a, b Function) Function {
 	return func(pi Input) Result {
-		return then(pi, a, b, combiner)
+		return then(pi, combiner, a, b)
 	}
 }
 
-func then(pi Input, a, b Function, combiner MultipleResultCombiner) Result {
+func then(pi Input, combiner MultipleResultCombiner, a, b Function) Result {
 	start := pi.Index()
 	ar := a(pi)
 

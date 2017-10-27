@@ -16,13 +16,13 @@ func TestThen(t *testing.T) {
 	}{
 		{
 			input:           "AB",
-			parser:          Then(Rune('A'), Rune('B'), ConcatenateToStringCombiner),
+			parser:          Then(WithStringConcatCombiner, Rune('A'), Rune('B')),
 			expected:        true,
 			expectedCapture: "AB",
 		},
 		{
 			input:    "ab",
-			parser:   Then(Rune('A'), Rune('B'), ConcatenateToStringCombiner),
+			parser:   Then(WithStringConcatCombiner, Rune('A'), Rune('B')),
 			expected: false,
 		},
 	}

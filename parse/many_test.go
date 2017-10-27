@@ -16,30 +16,30 @@ func TestMany(t *testing.T) {
 	}{
 		{
 			input:         "AAAAAAAA",
-			parser:        Many(Rune('A'), ConcatenateToStringCombiner, 0, 500),
+			parser:        Many(WithStringConcatCombiner, 0, 500, Rune('A')),
 			expectedMatch: true,
 			expectedItem:  "AAAAAAAA",
 		},
 		{
 			input:         "AAABBB",
-			parser:        Many(Rune('A'), ConcatenateToStringCombiner, 0, 500),
+			parser:        Many(WithStringConcatCombiner, 0, 500, Rune('A')),
 			expectedMatch: true,
 			expectedItem:  "AAA",
 		},
 		{
 			input:         "AAABBB",
-			parser:        Many(Or(Rune('A'), Rune('B')), ConcatenateToStringCombiner, 0, 500),
+			parser:        Many(WithStringConcatCombiner, 0, 500, Or(Rune('A'), Rune('B'))),
 			expectedMatch: true,
 			expectedItem:  "AAABBB",
 		},
 		{
 			input:         "AAABBB",
-			parser:        Many(Rune('A'), ConcatenateToStringCombiner, 4, 500),
+			parser:        Many(WithStringConcatCombiner, 4, 500, Rune('A')),
 			expectedMatch: false,
 		},
 		{
 			input:         "AAABBB",
-			parser:        Many(Rune('A'), ConcatenateToStringCombiner, 1, 2),
+			parser:        Many(WithStringConcatCombiner, 1, 2, Rune('A')),
 			expectedMatch: true,
 			expectedItem:  "AA",
 		},

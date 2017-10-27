@@ -4,13 +4,13 @@ import "errors"
 
 // Many captures the function at least x times and at most y times and sets the
 // result item to an array of the function captures.
-func Many(f Function, combiner MultipleResultCombiner, atLeast, atMost int) Function {
+func Many(combiner MultipleResultCombiner, atLeast, atMost int, f Function) Function {
 	return func(pi Input) Result {
-		return many(pi, f, combiner, atLeast, atMost)
+		return many(pi, combiner, atLeast, atMost, f)
 	}
 }
 
-func many(pi Input, f Function, combiner MultipleResultCombiner, atLeast, atMost int) Result {
+func many(pi Input, combiner MultipleResultCombiner, atLeast, atMost int, f Function) Result {
 	results := make([]interface{}, 0)
 
 	start := pi.Index()

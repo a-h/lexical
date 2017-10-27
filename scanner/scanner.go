@@ -13,15 +13,17 @@ type Scanner struct {
 	Parser parse.Function
 }
 
-func (s *Scanner) Next() parse.Result {
+// Next should be called repeatedly to request the next token from the stream.
+// If
+func (s *Scanner) Next() (item interface{}, err error) {
 	result := s.Parser(s.Input)
 	success := result.Success
 	if !success && result.Error != io.EOF {
 		line, col := s.Input.Position()
-		result.Error = fmt.Errorf("scanner: unmatched at line %v, column %v, item: %v", line, col, result)
+		return result.Item, fmt.Errorf("scanner: unmatched at line %v, column %v, item: %v", line, col, result)
 	}
 	s.Input.Collect()
-	return result
+	return result.Item, result.Error
 }
 
 // New creates a new Scanner.
