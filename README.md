@@ -1,6 +1,6 @@
 # Lexical
 
-A set of parsing tools.
+A set of parsing tools for Go inspired by [Sprache](https://github.com/sprache/Sprache/).
 
 ## Input
 
