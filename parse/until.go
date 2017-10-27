@@ -22,7 +22,7 @@ func stringUntil(pi Input, delimiter Function) Result {
 		current := pi.Index()
 		ds := delimiter(pi)
 		if ds.Success {
-			rewind(pi, int(pi.Index()-current))
+			rewind(pi, int(pi.Index()-current-1))
 			return Success(name, string(buf.Bytes()), ds.Error)
 		}
 		r, err := pi.Advance()

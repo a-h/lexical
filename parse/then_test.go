@@ -7,7 +7,7 @@ import (
 	"github.com/a-h/lexical/input"
 )
 
-func TestStringUntil(t *testing.T) {
+func TestThen(t *testing.T) {
 	tests := []struct {
 		input           string
 		parser          Function
@@ -15,28 +15,15 @@ func TestStringUntil(t *testing.T) {
 		expectedCapture string
 	}{
 		{
-			input:           "name=value",
-			parser:          StringUntil(String("=")),
+			input:           "AB",
+			parser:          Then(Rune('A'), Rune('B'), ConcatenateToStringCombiner),
 			expected:        true,
-			expectedCapture: "name",
+			expectedCapture: "AB",
 		},
 		{
-			input:           "name value",
-			parser:          StringUntil(Rune(' ')),
-			expected:        true,
-			expectedCapture: "name",
-		},
-		{
-			input:           "<tag>",
-			parser:          StringUntil(Rune('>')),
-			expected:        true,
-			expectedCapture: "<tag",
-		},
-		{
-			input:           "this is a test",
-			parser:          StringUntil(Rune('>')),
-			expected:        true,
-			expectedCapture: "this is a test",
+			input:    "ab",
+			parser:   Then(Rune('A'), Rune('B'), ConcatenateToStringCombiner),
+			expected: false,
 		},
 	}
 

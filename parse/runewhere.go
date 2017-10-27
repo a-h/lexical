@@ -3,6 +3,7 @@ package parse
 import (
 	"fmt"
 	"strings"
+	"unicode"
 )
 
 // RuneWhere captures a rune which matches a predicate.
@@ -35,4 +36,10 @@ func runeWhere(pi Input, name string, predicate func(r rune) bool) Result {
 		return Success(name, pr, err)
 	}
 	return Failure(name, err)
+}
+
+func RuneInRanges(rts ...*unicode.RangeTable) Function {
+	return func(pi Input) Result {
+		return runeWhere(pi, "rune in ranges", func(r rune) bool { return unicode.IsOneOf(rts, r) })
+	}
 }

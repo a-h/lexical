@@ -13,15 +13,25 @@ func All(combiner MultipleResultCombiner, functions ...Function) Function {
 }
 
 // MultipleResultCombiner combines the results from multiple parse operations into a single result.
-type MultipleResultCombiner func([]interface{}) interface{}
+type MultipleResultCombiner func([]interface{}) (result interface{}, ok bool)
 
-// ConcatenateStringsCombiner is a MultipleResultCombiner which concatenates the results together as a string.
-var ConcatenateStringsCombiner MultipleResultCombiner = func(inputs []interface{}) interface{} {
+// ConcatenateToStringCombiner is a MultipleResultCombiner which concatenates the results together as a string.
+var ConcatenateToStringCombiner MultipleResultCombiner = func(inputs []interface{}) (interface{}, bool) {
 	buf := bytes.NewBuffer([]byte{})
 	for _, ip := range inputs {
-		buf.WriteString(fmt.Sprintf("%v", ip))
+		switch v := ip.(type) {
+		case rune:
+			buf.WriteRune(v)
+		case string:
+			buf.WriteString(v)
+		case Function:
+			buf.WriteString("error: function passed to combiner")
+			return buf.String(), false
+		default:
+			buf.WriteString(fmt.Sprintf("%v", v))
+		}
 	}
-	return buf.String()
+	return buf.String(), true
 }
 
 func all(pi Input, combiner MultipleResultCombiner, functions ...Function) Result {
@@ -37,5 +47,9 @@ func all(pi Input, combiner MultipleResultCombiner, functions ...Function) Resul
 	}
 
 	// Combine all the results using the provided function.
-	return Success("inorder", combiner(results), nil)
+	item, ok := combiner(results)
+	if !ok {
+		return Failure("inorder", fmt.Errorf("failed to combine results"))
+	}
+	return Success("inorder", item, nil)
 }

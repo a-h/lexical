@@ -1,16 +1,15 @@
 package parse
 
+import "errors"
+
 // Then executes one function, then another, comining the results using the provided function.
-func Then(a, b Function, mapper ResultCombiner) Function {
+func Then(a, b Function, combiner MultipleResultCombiner) Function {
 	return func(pi Input) Result {
-		return then(pi, a, b, mapper)
+		return then(pi, a, b, combiner)
 	}
 }
 
-// ResultCombiner merges the results from a and b
-type ResultCombiner func(a, b interface{}) interface{}
-
-func then(pi Input, a, b Function, mapper ResultCombiner) Result {
+func then(pi Input, a, b Function, combiner MultipleResultCombiner) Result {
 	start := pi.Index()
 	ar := a(pi)
 
@@ -25,5 +24,9 @@ func then(pi Input, a, b Function, mapper ResultCombiner) Result {
 		return br
 	}
 
-	return Success("then", mapper(ar.Item, br.Item), br.Error)
+	item, ok := combiner([]interface{}{ar.Item, br.Item})
+	if !ok {
+		return Failure("then", errors.New("failed to combine results"))
+	}
+	return Success("then", item, br.Error)
 }

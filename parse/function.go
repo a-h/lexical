@@ -72,7 +72,16 @@ func (result Result) String() string {
 		success = "✓"
 	}
 
-	v := fmt.Sprintf("%v", result.Item)
+	var v string
+	switch ti := result.Item.(type) {
+	case rune:
+		v = string(ti)
+	case string:
+		v = ti
+	default:
+		v = fmt.Sprintf("%v", ti)
+	}
+
 	if len(v) > 13 {
 		v = v[0:10] + "..."
 	}
