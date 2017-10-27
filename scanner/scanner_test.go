@@ -40,7 +40,10 @@ var letterOrDigit = parse.RuneInRanges(unicode.Letter, unicode.Number)
 var xmlName = parse.Then(
 	parse.WithStringConcatCombiner,
 	parse.RuneWhere(unicode.IsLetter),
-	parse.Many(parse.WithStringConcatCombiner, 0, 500, letterOrDigit),
+	parse.Many(parse.WithStringConcatCombiner,
+		0,   // minimum match count
+		500, // maxmum match count
+		letterOrDigit),
 )
 
 var xmlOpenElement = parse.All(

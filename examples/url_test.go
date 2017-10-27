@@ -83,7 +83,10 @@ var domain = parse.All(parse.WithStringConcatCombiner,
 
 var path = parse.All(parse.WithStringConcatCombiner,
 	parse.Rune('/'),
-	parse.Many(parse.WithStringConcatCombiner, 0, 65536, parse.AnyRune()),
+	parse.Many(parse.WithStringConcatCombiner,
+		0,     // minimum match count
+		65536, // maximum match count
+		parse.AnyRune()),
 )
 
 var optionalPath = parse.Optional(parse.WithStringConcatCombiner, path)

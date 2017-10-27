@@ -10,6 +10,27 @@ func Many(combiner MultipleResultCombiner, atLeast, atMost int, f Function) Func
 	}
 }
 
+// Times captures the parser function a set number of times.
+func Times(combiner MultipleResultCombiner, times int, f Function) Function {
+	return func(pi Input) Result {
+		return many(pi, combiner, times, times, f)
+	}
+}
+
+// AtLeast captures the passed function at least the number of times provided.
+func AtLeast(combiner MultipleResultCombiner, times int, f Function) Function {
+	return func(pi Input) Result {
+		return many(pi, combiner, times, -1, f)
+	}
+}
+
+// AtMost captures the passed function between one and the number of times provided.
+func AtMost(combiner MultipleResultCombiner, times int, f Function) Function {
+	return func(pi Input) Result {
+		return many(pi, combiner, 1, times, f)
+	}
+}
+
 // Optional provides an optional parser.
 func Optional(combiner MultipleResultCombiner, f Function) Function {
 	return func(pi Input) Result {
@@ -33,7 +54,7 @@ func many(pi Input, combiner MultipleResultCombiner, atLeast, atMost int, f Func
 			break
 		}
 		results = append(results, r.Item)
-		if len(results) == atMost {
+		if atMost > 0 && len(results) == atMost {
 			break
 		}
 	}

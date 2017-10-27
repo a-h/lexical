@@ -54,6 +54,24 @@ func TestMany(t *testing.T) {
 			expectedMatch: true,
 			expectedItem:  12,
 		},
+		{
+			input:         "12",
+			parser:        AtLeast(WithIntegerCombiner, 1, ZeroToNine),
+			expectedMatch: true,
+			expectedItem:  12,
+		},
+		{
+			input:         "12",
+			parser:        AtMost(WithIntegerCombiner, 1, ZeroToNine),
+			expectedMatch: true,
+			expectedItem:  1,
+		},
+		{
+			input:         "12",
+			parser:        Times(WithIntegerCombiner, 1, ZeroToNine),
+			expectedMatch: true,
+			expectedItem:  1,
+		},
 	}
 
 	for i, test := range tests {

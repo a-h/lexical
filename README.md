@@ -42,33 +42,39 @@ The [examples](./examples) directory contains several examples of composing the 
 ### Functions
 
 * `Any`
-    * Parse any of the provided parse functions, or rollback.
+    * Parse any of the provided parse functions, or roll back.
 * `AnyRune`
     * Parse any rune.
+* `AtLeast`
+    * Parse the provided function at least the number of times specified, or roll back.
+* `AtMost`
+    * Parse the provided function at least once, and at most the number of times specified, or roll back.
 * `Letter`
-    * Parse any letter in the Unicode Letter range or rollback.
+    * Parse any letter in the Unicode Letter range or roll back.
 * `Many`
-    * Parse the provided parse function a number of times or rollback.
+    * Parse the provided parse function a number of times or roll back.
 * `Optional`
-    * Attempt to parse, but don't rollback if a match isn't found.
+    * Attempt to parse, but don't roll back if a match isn't found.
 * `Or`
-    * Return the first successful result of the provided parse functions, or rollback.
+    * Return the first successful result of the provided parse functions, or roll back.
 * `Rune`
     * Parse the specified rune (character) or fallback.
 * `RuneIn`
-    * Parse a rune from the input stream if it's in the specified string, or rollback.
+    * Parse a rune from the input stream if it's in the specified string, or roll back.
 * `RuneInRanges`
-    * Parse a rune from the input stream if it's in the specified Unicode ranges, or rollback.
+    * Parse a rune from the input stream if it's in the specified Unicode ranges, or roll back.
 * `RuneNotIn`
-    * Parse a rune from the input stream if it's not in the specified string, or rollback.
+    * Parse a rune from the input stream if it's not in the specified string, or roll back.
 * `RuneWhere`
-    * Parse a rune from the input stream if the predicate function passed in succeeds, or rollback.
+    * Parse a rune from the input stream if the predicate function passed in succeeds, or roll back.
 * `String`
-    * Parse a string from the input stream if it exactly matches the provided string, or rollback.
+    * Parse a string from the input stream if it exactly matches the provided string, or roll back.
 * `StringUntil`
     * Parse a string from the input stream until the end of the file or the specified _until_ parser is matched.
 * `Then`
-    * Return the results of the first and second parser passed through the combiner function which converts the two results into a single output (a map / reduce operation), or rollback if either doesn't match.
+    * Return the results of the first and second parser passed through the combiner function which converts the two results into a single output (a map / reduce operation), or roll back if either doesn't match.
+* `Times`
+    * Parse using the specified function a set number of times or roll back.
 * `ZeroToNine`
     * Parse a rune from the input stream if it's within the set of 1234567890.
 
