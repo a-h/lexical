@@ -12,7 +12,7 @@ func TestMany(t *testing.T) {
 		input         string
 		parser        Function
 		expectedMatch bool
-		expectedItem  string
+		expectedItem  interface{}
 	}{
 		{
 			input:         "AAAAAAAA",
@@ -42,6 +42,18 @@ func TestMany(t *testing.T) {
 			parser:        Many(WithStringConcatCombiner, 1, 2, Rune('A')),
 			expectedMatch: true,
 			expectedItem:  "AA",
+		},
+		{
+			input:         "1",
+			parser:        Many(WithIntegerCombiner, 1, 2, ZeroToNine),
+			expectedMatch: true,
+			expectedItem:  1,
+		},
+		{
+			input:         "12",
+			parser:        Many(WithIntegerCombiner, 1, 2, ZeroToNine),
+			expectedMatch: true,
+			expectedItem:  12,
 		},
 	}
 

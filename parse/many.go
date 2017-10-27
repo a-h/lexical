@@ -10,6 +10,13 @@ func Many(combiner MultipleResultCombiner, atLeast, atMost int, f Function) Func
 	}
 }
 
+// Optional provides an optional parser.
+func Optional(combiner MultipleResultCombiner, f Function) Function {
+	return func(pi Input) Result {
+		return many(pi, combiner, 0, 1, f)
+	}
+}
+
 func many(pi Input, combiner MultipleResultCombiner, atLeast, atMost int, f Function) Result {
 	results := make([]interface{}, 0)
 

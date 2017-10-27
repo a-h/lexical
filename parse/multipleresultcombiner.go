@@ -18,9 +18,6 @@ var WithStringConcatCombiner MultipleResultCombiner = func(inputs []interface{})
 			buf.WriteRune(v)
 		case string:
 			buf.WriteString(v)
-		case Function:
-			buf.WriteString("error: function passed to combiner")
-			return buf.String(), false
 		default:
 			buf.WriteString(fmt.Sprintf("%v", v))
 		}
