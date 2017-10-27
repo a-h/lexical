@@ -41,35 +41,35 @@ The [examples](./examples) directory contains several examples of composing the 
 
 ### Functions
 
-* Any
+* `Any`
     * Parse any of the provided parse functions, or rollback.
-* AnyRune
+* `AnyRune`
     * Parse any rune.
-* Letter
+* `Letter`
     * Parse any letter in the Unicode Letter range or rollback.
-* Many
+* `Many`
     * Parse the provided parse function a number of times or rollback.
-* Optional
+* `Optional`
     * Attempt to parse, but don't rollback if a match isn't found.
-* Or
+* `Or`
     * Return the first successful result of the provided parse functions, or rollback.
-* Rune
+* `Rune`
     * Parse the specified rune (character) or fallback.
-* RuneIn
+* `RuneIn`
     * Parse a rune from the input stream if it's in the specified string, or rollback.
-* RuneInRanges
+* `RuneInRanges`
     * Parse a rune from the input stream if it's in the specified Unicode ranges, or rollback.
-* RuneNotIn
+* `RuneNotIn`
     * Parse a rune from the input stream if it's not in the specified string, or rollback.
-* RuneWhere
+* `RuneWhere`
     * Parse a rune from the input stream if the predicate function passed in succeeds, or rollback.
-* String
+* `String`
     * Parse a string from the input stream if it exactly matches the provided string, or rollback.
-* StringUntil
+* `StringUntil`
     * Parse a string from the input stream until the end of the file or the specified _until_ parser is matched.
-* Then
+* `Then`
     * Return the results of the first and second parser passed through the combiner function which converts the two results into a single output (a map / reduce operation), or rollback if either doesn't match.
-* ZeroToNine
+* `ZeroToNine`
     * Parse a rune from the input stream if it's within the set of 1234567890.
 
 ### Examples
