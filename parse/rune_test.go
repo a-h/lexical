@@ -37,3 +37,11 @@ func TestRune(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkRune(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		parser := Rune('A')
+		parser(input.NewFromString("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+	}
+}

@@ -1,6 +1,8 @@
 package parse
 
-import "errors"
+import (
+	"errors"
+)
 
 // Then executes one function, then another, comining the results using the provided function.
 func Then(combiner MultipleResultCombiner, a, b Function) Function {
@@ -11,8 +13,8 @@ func Then(combiner MultipleResultCombiner, a, b Function) Function {
 
 func then(pi Input, combiner MultipleResultCombiner, a, b Function) Result {
 	start := pi.Index()
-	ar := a(pi)
 
+	ar := a(pi)
 	if !ar.Success {
 		rewind(pi, int(pi.Index()-start))
 		return ar

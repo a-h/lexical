@@ -35,3 +35,11 @@ func TestThen(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkThen(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		parser := Then(WithStringConcatCombiner, Rune('A'), Rune('B'))
+		parser(input.NewFromString("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+	}
+}

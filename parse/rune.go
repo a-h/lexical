@@ -10,7 +10,7 @@ func Rune(r rune) Function {
 }
 
 func parseRune(pi Input, r rune) Result {
-	name := fmt.Sprintf("rune '%v'", r)
+	name := "rune '" + string(r) + "'"
 
 	pr, err := pi.Peek()
 	if pr == r {
