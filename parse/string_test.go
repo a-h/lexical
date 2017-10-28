@@ -53,3 +53,10 @@ func TestString(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkString(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		String("ABCDEFG")(input.NewFromString("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+	}
+}

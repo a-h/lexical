@@ -1,9 +1,5 @@
 package parse
 
-import (
-	"fmt"
-)
-
 // String captures a specific string.
 func String(s string) Function {
 	return func(pi Input) Result {
@@ -12,7 +8,7 @@ func String(s string) Function {
 }
 
 func parseString(pi Input, s string) Result {
-	name := fmt.Sprintf("string: '%v'", s)
+	name := "string: '" + s + "'"
 
 	advancedBy := 0
 	for _, sr := range s {
