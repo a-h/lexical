@@ -69,3 +69,13 @@ func TestPositionString(t *testing.T) {
 		t.Errorf("Expected 'Line: 2, Col: 1', but got %v", p.String())
 	}
 }
+
+func BenchmarkPosition(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		p := NewPosition(1, 1)
+		p.Advance('a')
+		p.Advance('\n')
+		p.Retreat('\n')
+	}
+}

@@ -236,3 +236,36 @@ func TestStreamAdvanceCollectRetreat(t *testing.T) {
 		t.Error(s)
 	}
 }
+
+func BenchmarkStreamAdvance(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		s := NewFromString("ABCDEFG")
+		s.Advance()
+	}
+}
+
+func BenchmarkStreamRetreat(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		s := NewFromString("ABCDEFG")
+		s.Advance()
+		s.Retreat()
+	}
+}
+
+func BenchmarkStreamPeek(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		s := NewFromString("ABCDEFG")
+		s.Peek()
+	}
+}
+
+func BenchmarkStreamPosition(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		s := NewFromString("ABCDEFG")
+		s.Position()
+	}
+}
