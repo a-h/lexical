@@ -48,3 +48,11 @@ func TestStringUntil(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkUntil(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		parser := StringUntil(Rune('Z'))
+		parser(input.NewFromString("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+	}
+}

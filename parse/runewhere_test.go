@@ -2,6 +2,7 @@ package parse
 
 import (
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/a-h/lexical/input"
@@ -53,5 +54,14 @@ func TestRuneIn(t *testing.T) {
 		if result.Error != test.expectedError {
 			t.Errorf("test %v: for input '%v' expected error '%v' but got '%v'", i, test.input, test.expectedError, result.Error)
 		}
+	}
+}
+
+func BenchmarkRuneWhere(b *testing.B) {
+	isAToZ := func(r rune) bool { return strings.IndexRune("ABCDEFGHIJKLMNOPQRSTUVWXYZ", r) >= 0 }
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		parser := RuneWhere(isAToZ)
+		parser(input.NewFromString("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
 	}
 }

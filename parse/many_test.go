@@ -86,3 +86,11 @@ func TestMany(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkMany(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		parser := Many(WithStringConcatCombiner, 1, 1, Rune('A'))
+		parser(input.NewFromString("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+	}
+}

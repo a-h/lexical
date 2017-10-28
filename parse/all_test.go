@@ -57,16 +57,10 @@ func TestAll(t *testing.T) {
 	}
 }
 
-func TestWithStringConcatCombiner(t *testing.T) {
-	inputs := []interface{}{
-		'A',
-		"BCD",
-		'E',
-		1,
-		2.0,
-	}
-	result, _ := WithStringConcatCombiner(inputs)
-	if result != "ABCDE12" {
-		t.Errorf("Expected 'ABCDE12.0', but got '%v'", result)
+func BenchmarkAll(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		parser := All(WithStringConcatCombiner, Rune('A'), Rune('B'))
+		parser(input.NewFromString("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
 	}
 }

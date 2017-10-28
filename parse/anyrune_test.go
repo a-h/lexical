@@ -37,3 +37,11 @@ func TestAnyRune(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkAnyRune(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		parser := AnyRune()
+		parser(input.NewFromString("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+	}
+}

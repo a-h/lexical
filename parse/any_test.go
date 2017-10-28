@@ -54,3 +54,11 @@ func TestOr(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkAny(b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		parser := Any(Rune('A'), Rune('B'))
+		parser(input.NewFromString("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+	}
+}
