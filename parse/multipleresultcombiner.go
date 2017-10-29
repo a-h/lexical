@@ -1,7 +1,6 @@
 package parse
 
 import (
-	"bytes"
 	"fmt"
 	"strconv"
 )
@@ -11,34 +10,28 @@ type MultipleResultCombiner func([]interface{}) (result interface{}, ok bool)
 
 // WithStringConcatCombiner is a MultipleResultCombiner which concatenates the results together as a string.
 func WithStringConcatCombiner(inputs []interface{}) (interface{}, bool) {
-	buf := bytes.NewBuffer([]byte{})
+	buf := make([]byte, 0, len(inputs))
 	for _, ip := range inputs {
 		switch v := ip.(type) {
 		case rune:
-			buf.WriteRune(v)
+			buf = append(buf, string(v)...)
 		case string:
-			buf.WriteString(v)
+			buf = append(buf, v...)
 		default:
-			buf.WriteString(fmt.Sprintf("%v", v))
+			buf = append(buf, fmt.Sprintf("%v", v)...)
 		}
 	}
-	return buf.String(), true
+	return string(buf), true
 }
 
 // WithIntegerCombiner is a MultipleResultCombiner which concatenates the results together as a string then parses
 // the result as an integer.
 func WithIntegerCombiner(items []interface{}) (item interface{}, value bool) {
-	s := ""
-	for _, r := range items {
-		switch v := r.(type) {
-		case rune:
-			s += string(v)
-		case string:
-			s += v
-		default:
-			return 0, false
-		}
+	si, ok := WithStringConcatCombiner(items)
+	if !ok {
+		return 0, false
 	}
+	s, _ := si.(string)
 	i, err := strconv.ParseInt(s, 10, 32)
 	return int(i), err == nil
 }

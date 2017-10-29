@@ -10,11 +10,13 @@ func TestWithStringConcatCombiner(t *testing.T) {
 		"BCD",
 		'E',
 		1,
-		2.0,
+		2.1,
+		'一',
+		"个",
 	}
 	result, _ := WithStringConcatCombiner(inputs)
-	if result != "ABCDE12" {
-		t.Errorf("Expected 'ABCDE12.0', but got '%v'", result)
+	if result != "ABCDE12.1一个" {
+		t.Errorf("Expected 'ABCDE12.1一个', but got '%v'", result)
 	}
 }
 
@@ -40,6 +42,6 @@ func TestWithIntegerCombiner(t *testing.T) {
 func BenchmarkWithIntegerCombiner(b *testing.B) {
 	b.ReportAllocs()
 	for n := 0; n < b.N; n++ {
-		WithIntegerCombiner([]interface{}{1, 2, 3})
+		WithIntegerCombiner([]interface{}{'1', "2", '3'})
 	}
 }
