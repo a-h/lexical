@@ -1,7 +1,6 @@
 package parse
 
 import (
-	"fmt"
 	"strings"
 	"unicode"
 )
@@ -15,16 +14,16 @@ func RuneWhere(predicate func(r rune) bool) Function {
 
 // RuneIn captures a rune if it's within the input set.
 func RuneIn(set string) Function {
+	name := "any rune in '" + set + "'"
 	return func(pi Input) Result {
-		name := fmt.Sprintf("any rune in '%v'", set)
 		return runeWhere(pi, name, func(r rune) bool { return strings.ContainsRune(set, r) })
 	}
 }
 
 // RuneNotIn captures a rune if it's not within the input set.
 func RuneNotIn(set string) Function {
+	name := "any rune not in '" + set + "'"
 	return func(pi Input) Result {
-		name := fmt.Sprintf("any rune not in '%v'", set)
 		return runeWhere(pi, name, func(r rune) bool { return !strings.ContainsRune(set, r) })
 	}
 }

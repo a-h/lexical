@@ -1,7 +1,6 @@
 package examples
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/a-h/lexical/input"
@@ -15,9 +14,15 @@ func TestCompose(t *testing.T) {
 	matchesB := parser(input.NewFromString("B")).Success // true
 	matchesC := parser(input.NewFromString("C")).Success // false
 
-	fmt.Println(matchesA) // true
-	fmt.Println(matchesB) // true
-	fmt.Println(matchesC) // false
+	if !matchesA {
+		t.Errorf("for 'A', expected true, got false")
+	}
+	if !matchesB {
+		t.Errorf("for 'B', expected true, got false")
+	}
+	if matchesC {
+		t.Errorf("for 'C', expected false, got true")
+	}
 }
 
 func TestMany(t *testing.T) {
@@ -29,15 +34,27 @@ func TestMany(t *testing.T) {
 		parse.ZeroToNine)
 
 	resultA := oneToThreeNumbers(input.NewFromString("123"))
-	fmt.Println(resultA.Success) // true
-	fmt.Println(resultA.Item)    // integer value of 123
+	if !resultA.Success {
+		t.Error("for '123' expected success to be true, got false")
+	}
+	if resultA.Item != 123 {
+		t.Errorf("for '123' expected value of 123, but got '%v'", resultA.Item)
+	}
 
 	resultB := oneToThreeNumbers(input.NewFromString("1234"))
-	fmt.Println(resultB.Success) // true
-	fmt.Println(resultB.Item)    // integer value of 123
+	if !resultB.Success {
+		t.Errorf("for '1234', expected success to be true, got false")
+	}
+	if resultB.Item != 123 {
+		t.Errorf("for '1234' expected value of 123, but got '%v'", resultA.Item)
+	}
 
 	// This Many function will stop reading at the 'a'.
 	resultC := oneToThreeNumbers(input.NewFromString("1a234"))
-	fmt.Println(resultC.Success) // true
-	fmt.Println(resultC.Item)    // integer value of 1
+	if !resultC.Success {
+		t.Errorf("for '1a234', expected success to be true, got false")
+	}
+	if resultC.Item != 1 {
+		t.Errorf("for '1a234' expected value of 1, but got '%v'", resultA.Item)
+	}
 }

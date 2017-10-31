@@ -65,3 +65,11 @@ func BenchmarkRuneWhere(b *testing.B) {
 		parser(input.NewFromString("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
 	}
 }
+
+func BenchmarkRuneIn(b *testing.B) {
+	b.ReportAllocs()
+	parser := RuneIn("ABC")
+	for n := 0; n < b.N; n++ {
+		parser(input.NewFromString("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+	}
+}

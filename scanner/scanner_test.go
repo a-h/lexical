@@ -1,7 +1,6 @@
 package scanner
 
 import (
-	"fmt"
 	"io"
 	"reflect"
 	"testing"
@@ -17,8 +16,7 @@ func TestScanning(t *testing.T) {
 	scanner := New(stream, xmlTokens)
 	var err error
 	for {
-		item, err := scanner.Next()
-		fmt.Println(item)
+		_, err := scanner.Next()
 		if err != nil {
 			break
 		}
