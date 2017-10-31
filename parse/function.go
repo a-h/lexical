@@ -1,6 +1,7 @@
 package parse
 
 import "fmt"
+import "bytes"
 
 // Input represents the input to a parser.
 type Input interface {
@@ -61,35 +62,47 @@ func (result Result) Eq(cmp Result) bool {
 	return true
 }
 
+const tick, cross = "✓ ", "✗ "
+
 // String returns the string representation of a result, truncated to 10 characters.
 func (result Result) String() string {
 	if !result.Success {
 		return fmt.Sprintf("✗ (%v) err: %v", result.Name, result.Error)
 	}
 
-	success := "✗"
+	var buf bytes.Buffer
 	if result.Success {
-		success = "✓"
+		buf.WriteString(tick)
+	} else {
+		buf.WriteString(cross)
 	}
 
-	var v string
+	buf.WriteString("(")
+	buf.WriteString(result.Name)
+	buf.WriteString(") ")
+
 	switch ti := result.Item.(type) {
 	case rune:
-		v = string(ti)
+		buf.WriteRune(ti)
 	case string:
-		v = ti
+		if len(ti) > 13 {
+			buf.WriteString(ti[0:10] + "...")
+		} else {
+			buf.WriteString(ti)
+		}
 	default:
-		v = fmt.Sprintf("%v", ti)
+		s := fmt.Sprintf("%v", ti)
+		if len(s) > 13 {
+			buf.WriteString(s[0:10] + "...")
+		} else {
+			buf.WriteString(s)
+		}
 	}
 
-	if len(v) > 13 {
-		v = v[0:10] + "..."
-	}
-
-	e := ""
 	if result.Error != nil {
-		e = fmt.Sprintf("\n%v (%v) err: %v", success, result.Name, result.Error)
+		buf.WriteString("\n\t* err: ")
+		buf.WriteString(result.Error.Error())
 	}
 
-	return fmt.Sprintf("%v (%v) %v%v", success, result.Name, v, e)
+	return buf.String()
 }

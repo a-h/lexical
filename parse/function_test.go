@@ -62,7 +62,7 @@ func TestResultString(t *testing.T) {
 		},
 		{
 			input:    Success("a", 123, io.EOF),
-			expected: "✓ (a) 123\n✓ (a) err: EOF",
+			expected: "✓ (a) 123\n\t* err: EOF",
 		},
 	}
 
@@ -71,5 +71,15 @@ func TestResultString(t *testing.T) {
 		if actual != test.expected {
 			t.Errorf("test %v: expected '%v', but got '%v'", i, test.expected, actual)
 		}
+	}
+}
+
+func BenchmarkResultString(b *testing.B) {
+	b.ReportAllocs()
+	f := Failure("failure", nil)
+	s := Success("success", "a value was extracted", nil)
+	for n := 0; n < b.N; n++ {
+		s.String()
+		f.String()
 	}
 }
