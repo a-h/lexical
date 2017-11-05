@@ -84,22 +84,27 @@ func countHouses(filename string) int {
 	return houses
 }
 
+// XMLWhitespace is the space between elements.
 type XMLWhitespace string
 
+// XMLSelfClosingElement is an element that closes itself, e.g. <INPUT/>
 type XMLSelfClosingElement struct {
 	Name       string
 	Attributes []XMLAttribute
 }
 
+// XMLStartElement is a start element, e.g. <div>
 type XMLStartElement struct {
 	Name       string
 	Attributes []XMLAttribute
 }
 
+// XMLEndElement is an end element, e.g. </div>
 type XMLEndElement struct {
 	Name string
 }
 
+// XMLAttribute is an attribute of an element, e.g. key="value"
 type XMLAttribute struct {
 	Name  string
 	Value string
