@@ -61,7 +61,7 @@ func countHouses(filename string) int {
 	file, err := os.Open(filename)
 	handle(err)
 	defer file.Close()
-	buffer := bufio.NewReaderSize(file, 1024*1024*256) // 33554432
+	buffer := bufio.NewReaderSize(file, 1024*1024*256)
 	scan := scanner.New(input.New(buffer), xmlTokens)
 	for {
 		item, err := scan.Next()
