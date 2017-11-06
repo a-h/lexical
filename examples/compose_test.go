@@ -57,4 +57,12 @@ func TestMany(t *testing.T) {
 	if resultC.Item != 1 {
 		t.Errorf("for '1a234' expected value of 1, but got '%v'", resultA.Item)
 	}
+
+	// Parse letters into a string
+	upToThreeLetters := parse.AtMost(parse.WithStringConcatCombiner, 3, parse.Letter)
+	letters := upToThreeLetters(input.NewFromString("ABC1"))
+	resultItem, ok := letters.Item.(string)
+	if !ok || resultItem != "ABC" {
+		t.Errorf("for 'ABC1', expected to extract 'ABC', but extracted '%v'", letters.Item)
+	}
 }

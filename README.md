@@ -120,6 +120,15 @@ fmt.Println(resultB.Item)    // integer value of 123
 resultC := oneToThreeNumbers(input.NewFromString("1a234"))
 fmt.Println(resultC.Success) // true
 fmt.Println(resultC.Item)    // integer value of 1
+
+// Parse letters into a string
+upToThreeLetters := parse.AtMost(parse.WithStringConcatCombiner, 3, parse.Letter)
+letters := upToThreeLetters(input.NewFromString("ABC1"))
+// Check that we got a string back from the parser with a 'type assertion'.
+resultItem, ok := letters.Item.(string)
+if !ok || resultItem != "ABC" {
+    t.Errorf("for 'ABC1', expected to extract 'ABC', but extracted '%v'", letters.Item)
+}
 ```
 
 ## Scanner
