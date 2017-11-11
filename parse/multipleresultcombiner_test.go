@@ -21,9 +21,10 @@ func TestWithStringConcatCombiner(t *testing.T) {
 }
 
 func BenchmarkWithStringConcatCombiner(b *testing.B) {
+	items := []interface{}{'A', "BCDEF", 'G', "HIHJK"}
 	b.ReportAllocs()
 	for n := 0; n < b.N; n++ {
-		WithStringConcatCombiner([]interface{}{'A', "BCDEF", 'G', "HIHJK"})
+		WithStringConcatCombiner(items)
 	}
 }
 

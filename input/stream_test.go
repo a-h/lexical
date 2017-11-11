@@ -1,8 +1,62 @@
 package input
 
 import (
+	"io"
 	"testing"
 )
+
+func TestStringRuneReader(t *testing.T) {
+	sr := &StringRuneReader{
+		position: 0,
+		s:        "ABC爱得林",
+	}
+
+	a, _, err := sr.ReadRune()
+	expect(a, 'A', t)
+	b, _, err := sr.ReadRune()
+	expect(b, 'B', t)
+	c, _, err := sr.ReadRune()
+	expect(c, 'C', t)
+	ai, _, err := sr.ReadRune()
+	expect(ai, '爱', t)
+	de, _, err := sr.ReadRune()
+	expect(de, '得', t)
+	lin, _, err := sr.ReadRune()
+	expect(lin, '林', t)
+	_, _, err = sr.ReadRune()
+	if err != io.EOF {
+		t.Error("expected EOF, but didn't get it.")
+	}
+}
+
+func expect(actual, expected rune, t *testing.T) {
+	if actual != expected {
+		t.Errorf("expected '%v', got '%v'", expected, actual)
+	}
+}
+
+func TestStringRuneReaderReadPastEnd(t *testing.T) {
+	sr := &StringRuneReader{
+		position: 0,
+		s:        "A",
+	}
+
+	a, _, err := sr.ReadRune()
+	expect(a, 'A', t)
+	if err != nil {
+		t.Error("unexpected error")
+	}
+	// We've hit the end.
+	_, _, err = sr.ReadRune()
+	if err != io.EOF {
+		t.Error("expected EOF, but didn't get it.")
+	}
+	// Even though we got an error, ignore it and try again.
+	_, _, err = sr.ReadRune()
+	if err != io.EOF {
+		t.Error("expected EOF, but didn't get it.")
+	}
+}
 
 func TestStreamAdvance(t *testing.T) {
 	tests := []struct {

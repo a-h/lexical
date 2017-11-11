@@ -1,16 +1,16 @@
 package input
 
 import (
-	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"unicode/utf8"
 )
 
 // Stream defines a lexical scanner over a stream.
 type Stream struct {
 	// Input holds the Reader being scanned.
-	Input *bufio.Reader
+	Input io.RuneReader
 	// Buffer is the space currently being searched for tokens to avoid seeking the input stream.
 	// When a token match is found, the buffer is emptied.
 	Buffer []rune
@@ -32,7 +32,7 @@ func (l *Stream) String() string {
 }
 
 // New creates a new parser input from a buffered reader.
-func New(input *bufio.Reader) *Stream {
+func New(input io.RuneReader) *Stream {
 	return &Stream{
 		Input:    input,
 		Buffer:   make([]rune, 0),
@@ -40,11 +40,29 @@ func New(input *bufio.Reader) *Stream {
 	}
 }
 
+// StringRuneReader allows a string to be read rune-by-rune. It allocates slightly less variables than
+// NewBufferString or NewReader.
+type StringRuneReader struct {
+	position int
+	s        string
+}
+
+// ReadRune reads a rune from the underlying string.
+func (sr *StringRuneReader) ReadRune() (r rune, size int, err error) {
+	r, size = utf8.DecodeRuneInString(sr.s[sr.position:])
+	if size == 0 {
+		err = io.EOF
+	}
+	sr.position += size
+	return
+}
+
 // NewFromString creates a new parser input from an input string.
 func NewFromString(input string) *Stream {
-	bs := bytes.NewBufferString(input)
-	sr := bufio.NewReader(bs)
-	return New(sr)
+	return New(&StringRuneReader{
+		position: 0,
+		s:        input,
+	})
 }
 
 // Collect returns the value of the consumed buffer and updates the position of the stream to the current

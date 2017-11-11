@@ -10,7 +10,7 @@ type MultipleResultCombiner func([]interface{}) (result interface{}, ok bool)
 
 // WithStringConcatCombiner is a MultipleResultCombiner which concatenates the results together as a string.
 func WithStringConcatCombiner(inputs []interface{}) (interface{}, bool) {
-	buf := make([]byte, 0, len(inputs))
+	var buf []byte
 	for _, ip := range inputs {
 		switch v := ip.(type) {
 		case rune:
