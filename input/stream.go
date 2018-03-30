@@ -133,6 +133,27 @@ func (l *Stream) Peek() (rune, error) {
 	return r, nil
 }
 
+// PeekN reads a number of runes from the Input, then sets the current position back.
+func (l *Stream) PeekN(n int) (s string, err error) {
+	rs := make([]rune, n)
+	var advanced int
+	for i := 0; i < n; i++ {
+		rs[i], err = l.Advance()
+		if err != nil {
+			break
+		}
+		advanced++
+	}
+
+	s = string(rs)
+
+	for i := 0; i < n; i++ {
+		l.Retreat()
+	}
+
+	return
+}
+
 // ErrStartOfFile is the error used when we've retreated to the start of the file and can't
 // retreat any further.
 var ErrStartOfFile = errors.New("SOF")

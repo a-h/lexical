@@ -236,6 +236,26 @@ func TestStreamPeek(t *testing.T) {
 	}
 }
 
+func TestStreamPeekN(t *testing.T) {
+	s := NewFromString("ABCDEFG")
+
+	startPosition := s.Current
+	startRune := s.CurrentRune
+
+	peekedString, _ := s.PeekN(3)
+	if peekedString != "ABC" {
+		t.Errorf("Expected to peek 'ABC', but got '%v'", peekedString)
+	}
+
+	if s.Current != startPosition {
+		t.Error("Peeking shouldn't modify the current position")
+	}
+
+	if s.CurrentRune != startRune {
+		t.Error("Peeking shouldn't change the current rune")
+	}
+}
+
 func TestStreamCollect(t *testing.T) {
 	s := NewFromString("ABCDEFG")
 
