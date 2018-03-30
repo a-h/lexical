@@ -14,7 +14,7 @@ func parseString(pi Input, s string) Result {
 	for _, sr := range s {
 		pr, err := pi.Peek()
 		if pr != sr {
-			err = rewind(pi, advancedBy)
+			rewind(pi, advancedBy)
 			return Failure(name, err)
 		}
 		pi.Advance()
