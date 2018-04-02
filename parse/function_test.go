@@ -79,7 +79,7 @@ func BenchmarkResultString(b *testing.B) {
 	f := Failure("failure", nil)
 	s := Success("success", "a value was extracted", nil)
 	for n := 0; n < b.N; n++ {
-		s.String()
-		f.String()
+		_ = s.String()
+		_ = f.String()
 	}
 }
