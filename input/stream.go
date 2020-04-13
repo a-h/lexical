@@ -7,13 +7,75 @@ import (
 	"unicode/utf8"
 )
 
+type Buffer struct {
+	data    []rune
+	current int
+}
+
+func NewBuffer(size int) *Buffer {
+	return &Buffer{
+		data: make([]rune, size),
+	}
+}
+
+func NewBufferFromString(s string, size int) *Buffer {
+	b := NewBuffer(size)
+	b.Append([]rune(s)...)
+	return b
+}
+
+func (b *Buffer) Append(runes ...rune) error {
+	if len(runes)+b.current > len(b.data) {
+		return fmt.Errorf("buffer: cannot write more data (%v bytes) than the buffer's capacity (%v bytes)",
+			len(runes)+b.current, len(b.data))
+	}
+	for i, r := range runes {
+		b.data[i+b.current] = r
+	}
+	b.current += len(runes)
+	return nil
+}
+
+func (b *Buffer) Peek() string {
+	return string(b.data[:b.current])
+}
+
+func (b *Buffer) Collect() (s string) {
+	s = string(b.data[:b.current])
+	b.current = 0
+	return
+}
+
+func (b *Buffer) CollectSlice(max int) (s string) {
+	if max > b.current {
+		return b.Collect()
+	}
+	s = string(b.data[:max])
+	// Shift everything to the left.
+	start := 0
+	for i := max; i < b.current; i++ {
+		b.data[start] = b.data[i]
+		start++
+	}
+	b.current = b.current - max
+	return
+}
+
+func (b *Buffer) At(i int) rune {
+	return b.data[i]
+}
+
+func (b *Buffer) Len() int {
+	return b.current
+}
+
 // Stream defines a lexical scanner over a stream.
 type Stream struct {
 	// Input holds the Reader being scanned.
 	Input io.RuneReader
 	// Buffer is the space currently being searched for tokens to avoid seeking the input stream.
 	// When a token match is found, the buffer is emptied.
-	Buffer []rune
+	Buffer *Buffer
 	// Start represents the start position of the lexer against the Input, e.g.
 	// if we've lexed 124 runes already, that's where we're starting from.
 	Start int64
@@ -28,14 +90,15 @@ type Stream struct {
 }
 
 func (l *Stream) String() string {
-	return fmt.Sprintf("Current Rune: '%v', Start of Token Position: %v, Current Position: %v, Forward Buffer Size: %v, Current Buffer: '%v'", string(l.CurrentRune), l.Start, l.Current, len(l.Buffer), string(l.Buffer))
+	return fmt.Sprintf("Current Rune: '%v', Start of Token Position: %v, Current Position: %v, Forward Buffer Size: %v, Current Buffer: '%v'",
+		string(l.CurrentRune), l.Start, l.Current, l.Buffer.Len(), l.Buffer.Peek())
 }
 
 // New creates a new parser input from a buffered reader.
 func New(input io.RuneReader) *Stream {
 	return &Stream{
 		Input:    input,
-		Buffer:   make([]rune, 0),
+		Buffer:   NewBuffer(1024 * 8),
 		position: NewPosition(1, 0),
 	}
 }
@@ -70,38 +133,21 @@ func NewFromString(input string) *Stream {
 func (l *Stream) Collect() string {
 	// Emit the token and update the position of the lexer against the input stream.
 	// Returning the item helps with unit testing.
-	length := int(l.Current - l.Start)
-	left := getLeft(l.Buffer, length)
-	right := getRight(l.Buffer, length)
+	amountToReturn := l.Current - l.Start
 	l.Start = l.Current
-	l.Buffer = right
-	return string(left)
+	return l.Buffer.CollectSlice(int(amountToReturn))
 }
 
-func getLeft(runes []rune, length int) []rune {
-	if length > len(runes) {
-		return runes
-	}
-	return runes[:length]
-}
-
-func getRight(runes []rune, start int) []rune {
-	if start >= len(runes) {
-		return make([]rune, 0)
-	}
-	return runes[start:]
-}
-
-func fromBuffer(startOfBufferIndex int64, currentIndex int64, buffer []rune) (r rune, ok bool) {
+func fromBuffer(startOfBufferIndex int64, currentIndex int64, buffer *Buffer) (r rune, ok bool) {
 	index := int(currentIndex-startOfBufferIndex) - 1
 	if index < 0 {
 		// Can't read before the buffer.
 		return 0x0, false
 	}
-	if index >= len(buffer) {
+	if index >= buffer.Len() {
 		return 0x0, false
 	}
-	return buffer[index], true
+	return buffer.At(index), true
 }
 
 // Advance reads a rune from the Input and sets the current position.
@@ -112,7 +158,9 @@ func (l *Stream) Advance() (r rune, err error) {
 	r, ok := fromBuffer(l.Start, l.Current, l.Buffer)
 	if !ok {
 		r, _, err = l.Input.ReadRune()
-		l.Buffer = append(l.Buffer, r)
+		if l.Buffer.Append(r) != nil {
+			return r, err
+		}
 	}
 
 	l.CurrentRune = r

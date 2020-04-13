@@ -7,7 +7,7 @@ func TestFromBufferFunction(t *testing.T) {
 		name               string
 		startOfBufferIndex int64
 		currentIndex       int64
-		buffer             string
+		buffer             *Buffer
 		expectedRune       rune
 		expectedOK         bool
 	}{
@@ -15,7 +15,7 @@ func TestFromBufferFunction(t *testing.T) {
 			name:               "Read A from 'ABC'",
 			startOfBufferIndex: 0,
 			currentIndex:       1,
-			buffer:             "ABC",
+			buffer:             NewBufferFromString("ABC", 3),
 			expectedRune:       'A',
 			expectedOK:         true,
 		},
@@ -23,7 +23,7 @@ func TestFromBufferFunction(t *testing.T) {
 			name:               "Read B from 'ABC'",
 			startOfBufferIndex: 0,
 			currentIndex:       2,
-			buffer:             "ABC",
+			buffer:             NewBufferFromString("ABC", 3),
 			expectedRune:       'B',
 			expectedOK:         true,
 		},
@@ -31,7 +31,7 @@ func TestFromBufferFunction(t *testing.T) {
 			name:               "Read C from 'ABC'",
 			startOfBufferIndex: 0,
 			currentIndex:       3,
-			buffer:             "ABC",
+			buffer:             NewBufferFromString("ABC", 3),
 			expectedRune:       'C',
 			expectedOK:         true,
 		},
@@ -39,14 +39,14 @@ func TestFromBufferFunction(t *testing.T) {
 			name:               "Read D from 'ABC'",
 			startOfBufferIndex: 0,
 			currentIndex:       4,
-			buffer:             "ABC",
+			buffer:             NewBufferFromString("ABC", 3),
 			expectedRune:       0x0,
 			expectedOK:         false,
 		},
 	}
 
 	for _, test := range tests {
-		r, ok := fromBuffer(test.startOfBufferIndex, test.currentIndex, []rune(test.buffer))
+		r, ok := fromBuffer(test.startOfBufferIndex, test.currentIndex, test.buffer)
 		if r != test.expectedRune {
 			t.Errorf("%s: expected rune '%v' but got '%v'", test.name, string(test.expectedRune), string(r))
 		}

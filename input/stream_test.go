@@ -159,63 +159,6 @@ func TestStreamRetreat_CannotReadBeforeStartOfStream(t *testing.T) {
 	}
 }
 
-func TestStreamLeftAndRight(t *testing.T) {
-	tests := []struct {
-		input  string
-		middle int
-		left   string
-		right  string
-	}{
-		{
-			input:  "abcd",
-			middle: 0,
-			left:   "",
-			right:  "abcd",
-		},
-		{
-			input:  "abcd",
-			middle: 1,
-			left:   "a",
-			right:  "bcd",
-		},
-		{
-			input:  "abcd",
-			middle: 2,
-			left:   "ab",
-			right:  "cd",
-		},
-		{
-			input:  "abcd",
-			middle: 3,
-			left:   "abc",
-			right:  "d",
-		},
-		{
-			input:  "abcd",
-			middle: 4,
-			left:   "abcd",
-			right:  "",
-		},
-		{
-			input:  "abcd",
-			middle: 5,
-			left:   "abcd",
-			right:  "",
-		},
-	}
-
-	for _, test := range tests {
-		l := getLeft([]rune(test.input), test.middle)
-		if string(l) != test.left {
-			t.Errorf("for input '%v', at middle %v, expected left of '%v' but got '%v'", test.input, test.middle, test.left, string(l))
-		}
-		r := getRight([]rune(test.input), test.middle)
-		if string(r) != test.right {
-			t.Errorf("for input '%v', at middle %v, expected right of '%v' but got '%v'", test.input, test.middle, test.right, string(l))
-		}
-	}
-}
-
 func TestStreamPeek(t *testing.T) {
 	s := NewFromString("ABCDEFG")
 
