@@ -12,17 +12,20 @@ func TestThen(t *testing.T) {
 		parser          Function
 		expected        bool
 		expectedCapture string
+		expectedIndex   int64
 	}{
 		{
 			input:           "AB",
 			parser:          Then(WithStringConcatCombiner, Rune('A'), Rune('B')),
 			expected:        true,
 			expectedCapture: "AB",
+			expectedIndex:   2,
 		},
 		{
-			input:    "ab",
-			parser:   Then(WithStringConcatCombiner, Rune('A'), Rune('B')),
-			expected: false,
+			input:         "ab",
+			parser:        Then(WithStringConcatCombiner, Rune('A'), Rune('B')),
+			expected:      false,
+			expectedIndex: 0,
 		},
 	}
 
@@ -32,6 +35,9 @@ func TestThen(t *testing.T) {
 		actual := result.Success
 		if actual != test.expected {
 			t.Errorf("test %v: for input '%v' expected %v but got %v, catpured '%v'", i, test.input, test.expected, actual, result.Item)
+		}
+		if test.expectedIndex != pi.Index() {
+			t.Errorf("test %v: for input '%v' expected index %d, got %d", i, test.input, test.expectedIndex, pi.Index())
 		}
 	}
 }

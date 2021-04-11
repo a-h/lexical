@@ -1,6 +1,9 @@
 package parse
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 // Many captures the function at least x times and at most y times and sets the
 // result item to an array of the function captures.
@@ -41,22 +44,22 @@ func Optional(combiner MultipleResultCombiner, f Function) Function {
 func many(pi Input, combiner MultipleResultCombiner, atLeast, atMost int, f Function) Result {
 	results := make([]interface{}, 0)
 
-	start := pi.Index()
+	globalRollback := pi.Index()
 	for {
+		localRollback := pi.Index()
 		r := f(pi)
 		if !r.Success {
-			if len(results) < atLeast {
-				// Roll back, because we didn't get enough.
-				rewind(pi, int(pi.Index()-start))
-				return r
-			}
-			// We're OK to stop.
+			rewind(pi, int(pi.Index()-localRollback))
 			break
 		}
 		results = append(results, r.Item)
 		if atMost > 0 && len(results) == atMost {
 			break
 		}
+	}
+	if len(results) < atLeast {
+		rewind(pi, int(pi.Index()-globalRollback))
+		return Failure("many", fmt.Errorf("expected at least %d results, got %d", atLeast, len(results)))
 	}
 
 	item, ok := combiner(results)

@@ -10,23 +10,64 @@ import (
 	"github.com/a-h/lexical/parse"
 )
 
-func TestScanning(t *testing.T) {
-	stream := input.NewFromString(`<a>Example</a>`)
+func TestScanningAnyRunes(t *testing.T) {
+	text := `abcdef`
+	stream := input.NewFromString(text)
 
-	scanner := New(stream, xmlTokens)
+	var output string
+	scanner := New(stream, parse.AnyRune())
+	var i int
 	var err error
 	for {
-		_, err := scanner.Next()
+		item, err := scanner.Next()
 		if err != nil {
+			break
+		}
+		output += string(item.(rune))
+		i++
+		if i > 10 {
+			t.Errorf("infinite loop?")
 			break
 		}
 	}
 	if err != nil && err != io.EOF {
 		t.Error(err)
 	}
+	if i != 6 {
+		t.Errorf("expected to read 6 runes, got %d", i)
+	}
+	if output != text {
+		t.Errorf("expected %q, got %q", text, output)
+	}
 }
 
-var xmlTokens = parse.Any(xmlOpenElement, xmlText, xmlCloseElement)
+func TestScanning(t *testing.T) {
+	text := `<a>abc</a><b>def</b>`
+	stream := input.NewFromString(text)
+
+	scanner := New(stream, xmlTag)
+	var i int
+	var err error
+	for {
+		_, err := scanner.Next()
+		if err != nil {
+			break
+		}
+		i++
+		if i > 10 {
+			t.Errorf("infinite loop")
+			break
+		}
+	}
+	if err != nil && err != io.EOF {
+		t.Error(err)
+	}
+	if i != 2 {
+		t.Errorf("expected to read 2 tags (2 x open, text, and close), but got %d", i)
+	}
+}
+
+var xmlTag = parse.All(parse.WithStringConcatCombiner, xmlOpenElement, xmlText, xmlCloseElement)
 
 var combineTagAndContents parse.MultipleResultCombiner = func(results []interface{}) (interface{}, bool) {
 	name, ok := results[1].(string)
@@ -40,24 +81,24 @@ var xmlName = parse.Then(
 	parse.RuneWhere(unicode.IsLetter),
 	parse.Many(parse.WithStringConcatCombiner,
 		0,   // minimum match count
-		500, // maxmum match count
+		500, // maximum match count
 		letterOrDigit),
 )
 
 var xmlOpenElement = parse.All(
 	combineTagAndContents,
 	parse.Rune('<'),
-	xmlName,
+	parse.StringUntil(parse.Rune('>')),
 	parse.Rune('>'),
 )
 
-var xmlText = parse.StringUntil(parse.Rune('<'))
+var xmlText = parse.StringUntil(parse.String("<"))
 
 var xmlCloseElement = parse.All(
 	parse.WithStringConcatCombiner,
-	parse.Rune('<'),
-	parse.Rune('/'),
-	parse.StringUntil(parse.Rune('>')),
+	parse.String("</"),
+	parse.StringUntil(parse.String(">")),
+	parse.String(">"),
 )
 
 func TestXMLName(t *testing.T) {

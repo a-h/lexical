@@ -38,6 +38,22 @@ func TestAll(t *testing.T) {
 			expectedPosition: 2,
 			expectedItem:     "ZC",
 		},
+		{
+			name:             "<abc>",
+			parsers:          []Function{Rune('<'), String("abc"), Rune('>')},
+			input:            "<abc>",
+			expected:         true,
+			expectedPosition: 5,
+			expectedItem:     "<abc>",
+		},
+		{
+			name:             "<abc> - until c",
+			parsers:          []Function{Rune('<'), StringUntil(String("c")), String("c"), Rune('>')},
+			input:            "<abc>",
+			expected:         true,
+			expectedPosition: 5,
+			expectedItem:     "<abc>",
+		},
 	}
 
 	for _, test := range tests {

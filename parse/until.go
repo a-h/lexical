@@ -21,7 +21,7 @@ func stringUntil(pi Input, delimiter Function) Result {
 		current := pi.Index()
 		ds := delimiter(pi)
 		if ds.Success {
-			rewind(pi, int(pi.Index()-current-1))
+			rewind(pi, int(pi.Index()-current))
 			return Success(name, string(runes), ds.Error)
 		}
 		r, err := pi.Advance()

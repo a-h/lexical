@@ -12,15 +12,18 @@ func TestAnyRune(t *testing.T) {
 		input         string
 		expected      bool
 		expectedError error
+		expectedIndex int64
 	}{
 		{
-			input:    "A",
-			expected: true,
+			input:         "A",
+			expected:      true,
+			expectedIndex: 1,
 		},
 		{
 			input:         "",
 			expected:      false,
 			expectedError: io.EOF,
+			expectedIndex: 1,
 		},
 	}
 
@@ -34,6 +37,9 @@ func TestAnyRune(t *testing.T) {
 		}
 		if result.Error != test.expectedError {
 			t.Errorf("test %v: for input '%v' expected error '%v' but got '%v'", i, test.input, test.expectedError, result.Error)
+		}
+		if test.expectedIndex != pi.Index() {
+			t.Errorf("test %v: for input '%v' expected index %d, got %d", i, test.input, test.expectedIndex, pi.Index())
 		}
 	}
 }

@@ -169,11 +169,9 @@ func TestStreamPeek(t *testing.T) {
 	if peekedRune != 'A' {
 		t.Errorf("Expected to peek 'A', but got '%v'", peekedRune)
 	}
-
 	if s.Current != startPosition {
 		t.Error("Peeking shouldn't modify the current position")
 	}
-
 	if s.CurrentRune != startRune {
 		t.Error("Peeking shouldn't change the current rune")
 	}
@@ -189,11 +187,9 @@ func TestStreamPeekN(t *testing.T) {
 	if peekedString != "ABC" {
 		t.Errorf("Expected to peek 'ABC', but got '%v'", peekedString)
 	}
-
 	if s.Current != startPosition {
 		t.Error("Peeking shouldn't modify the current position")
 	}
-
 	if s.CurrentRune != startRune {
 		t.Error("Peeking shouldn't change the current rune")
 	}
@@ -251,6 +247,16 @@ func TestStreamAdvanceCollectRetreat(t *testing.T) {
 	if cdef != "CDEF" {
 		t.Errorf("Expected to collect 'CDEF', but got '%v'", cdef)
 		t.Error(s)
+	}
+	expectRune(s, s.Advance, 'G', t, "7")
+	if s.Index() != 7 {
+		t.Errorf("expected to be at last rune of string (g/7), got %d", s.Index())
+	}
+	if _, err := s.Peek(); err != io.EOF {
+		t.Errorf("expected peek EOF, got %v", err)
+	}
+	if _, err := s.Advance(); err != io.EOF {
+		t.Errorf("expected advance EOF, got %v", err)
 	}
 }
 

@@ -49,6 +49,17 @@ func TestStringUntil(t *testing.T) {
 	}
 }
 
+func TestStringUntilInput(t *testing.T) {
+	pi := input.NewFromString("abcd")
+	result := StringUntil(String("cd"))(pi)
+	if !result.Success {
+		t.Errorf("unexpected failure")
+	}
+	if pi.Index() != 2 {
+		t.Errorf("expected to be at index 2, but at %v", pi.Index())
+	}
+}
+
 func BenchmarkUntil(b *testing.B) {
 	b.ReportAllocs()
 	for n := 0; n < b.N; n++ {

@@ -12,27 +12,39 @@ func TestString(t *testing.T) {
 		s               string
 		expected        bool
 		expectedCapture string
+		expectedIndex   int64
 	}{
 		{
 			input:           "ABC",
 			s:               "ABC",
 			expected:        true,
 			expectedCapture: "ABC",
+			expectedIndex:   3,
 		},
 		{
-			input:    "ABC",
-			s:        "DEF",
-			expected: false,
+			input:           "ABC",
+			s:               "AB",
+			expected:        true,
+			expectedCapture: "AB",
+			expectedIndex:   2,
 		},
 		{
-			input:    "ABC",
-			s:        "BCD",
-			expected: false,
+			input:         "ABC",
+			s:             "DEF",
+			expected:      false,
+			expectedIndex: 0,
 		},
 		{
-			input:    "ABD",
-			s:        "ABC",
-			expected: false,
+			input:         "ABC",
+			s:             "BCD",
+			expected:      false,
+			expectedIndex: 0,
+		},
+		{
+			input:         "ABD",
+			s:             "ABC",
+			expected:      false,
+			expectedIndex: 0,
 		},
 	}
 
@@ -44,12 +56,8 @@ func TestString(t *testing.T) {
 		if actual != test.expected {
 			t.Errorf("test %v: for input '%v' expected %v but got %v", i, test.input, test.expected, actual)
 		}
-		var expectedPosition int64
-		if test.expected {
-			expectedPosition = int64(len(test.input))
-		}
-		if pi.Current != expectedPosition {
-			t.Errorf("test %v: for input '%v' expected to be at position %v but was at %v", i, test.input, expectedPosition, pi.Current)
+		if test.expectedIndex != pi.Index() {
+			t.Errorf("test %v: for input '%v' expected index %d, got %d", i, test.input, test.expectedIndex, pi.Index())
 		}
 	}
 }
