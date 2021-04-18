@@ -4,18 +4,24 @@ import "fmt"
 
 // Position represents the character position within a text file.
 type Position struct {
-	Line int
-	Col  int
+	Index int64
+	Line  int
+	Col   int
 	// The lengths of each line we've seen.
-	lineLengths map[int]int
+	lineLengths     map[int]int
+	carriageReturns map[int64]struct{}
+	lineFeeds       map[int64]struct{}
 }
 
 // NewPosition creates a Position to represent the character position within a text file.
 func NewPosition(line int, col int) Position {
 	return Position{
-		Line:        line,
-		Col:         col,
-		lineLengths: make(map[int]int),
+		Index:           int64(-1),
+		Line:            line,
+		Col:             col,
+		lineLengths:     make(map[int]int),
+		carriageReturns: make(map[int64]struct{}),
+		lineFeeds:       make(map[int64]struct{}),
 	}
 }
 
@@ -32,12 +38,14 @@ func (p *Position) Eq(cmp Position) bool {
 // Advance advances the position by a line if the rune is'\n', does nothing if the rune
 // is '\r' and advances by a col character if the rune is anything else.
 func (p *Position) Advance(r rune) {
+	p.Index++
 	if r == '\r' {
+		p.carriageReturns[p.Index] = struct{}{}
 		return
 	}
 	if r == '\n' {
-		// Store the line length for when we retreat.
 		p.lineLengths[p.Line] = p.Col
+		p.lineFeeds[p.Index] = struct{}{}
 		p.Line++
 		p.Col = 0
 		return
@@ -48,12 +56,16 @@ func (p *Position) Advance(r rune) {
 // Retreat decreases the position by a line if the rune is'\n', does nothing if the rune
 // is '\r' and decreases by a col character if the rune is anything else.
 func (p *Position) Retreat(r rune) {
+	p.Index--
 	if r == '\r' {
 		return
 	}
-	if r == '\n' {
+	lfIndex := p.Index + 1
+	if _, isRetreatingFromCR := p.carriageReturns[p.Index+1]; isRetreatingFromCR {
+		lfIndex++
+	}
+	if _, isRetreatingFromNewLine := p.lineFeeds[lfIndex]; isRetreatingFromNewLine {
 		p.Line--
-		// Retrieve the line length.
 		p.Col = p.lineLengths[p.Line]
 		return
 	}

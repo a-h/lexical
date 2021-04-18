@@ -14,8 +14,8 @@ func All(combiner MultipleResultCombiner, functions ...Function) Function {
 func all(pi Input, combiner MultipleResultCombiner, functions ...Function) Result {
 	results := make([]interface{}, len(functions))
 	start := pi.Index()
-	for i, f := range functions {
-		r := f(pi)
+	for i := 0; i < len(functions); i++ {
+		r := functions[i](pi)
 		if !r.Success {
 			rewind(pi, int(pi.Index()-start))
 			return r
