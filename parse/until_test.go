@@ -34,8 +34,14 @@ func TestStringUntil(t *testing.T) {
 		{
 			input:           "this is a test",
 			parser:          StringUntil(Rune('>')),
+			expected:        false,
+			expectedCapture: "",
+		},
+		{
+			input:           "this is> a test",
+			parser:          StringUntil(Rune('>')),
 			expected:        true,
-			expectedCapture: "this is a test",
+			expectedCapture: "this is",
 		},
 	}
 

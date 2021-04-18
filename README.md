@@ -70,7 +70,7 @@ The [examples](./examples) directory contains several examples of composing the 
 * `String`
     * Parse a string from the input stream if it exactly matches the provided string, or roll back.
 * `StringUntil`
-    * Parse a string from the input stream until the end of the file or the specified _until_ parser is matched.
+    * Parse a string from the input stream until the specified _until_ parser is matched.
 * `Then`
     * Return the results of the first and second parser passed through the combiner function which converts the two results into a single output (a map / reduce operation), or roll back if either doesn't match.
 * `Times`
