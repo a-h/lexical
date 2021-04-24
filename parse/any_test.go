@@ -1,6 +1,7 @@
 package parse
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/a-h/lexical/input"
@@ -52,6 +53,18 @@ func TestOr(t *testing.T) {
 		if pi.Current != expectedPosition {
 			t.Errorf("test %v: for input '%v' expected to be at position %v but was at %v", test.name, test.input, expectedPosition, pi.Current)
 		}
+	}
+}
+
+func TestAnyErrorHandling(t *testing.T) {
+	expectedError := errors.New("test error")
+	errorParser := func(ip Input) (result Result) {
+		return Failure("error", expectedError)
+	}
+	pi := input.NewFromString("B")
+	result := Any(Rune('A'), errorParser)(pi)
+	if expectedError != result.Error {
+		t.Errorf("expected error '%v', got '%v'", expectedError, result)
 	}
 }
 

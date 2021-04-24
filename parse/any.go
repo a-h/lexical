@@ -1,5 +1,7 @@
 package parse
 
+import "io"
+
 // Any returns the first match out of the parse functions passed in, or a failure if no
 // parsers match.
 func Any(functions ...Function) Function {
@@ -16,6 +18,9 @@ func Or(a, b Function) Function {
 func any(pi Input, functions ...Function) Result {
 	for _, f := range functions {
 		r := f(pi)
+		if r.Error != nil && r.Error != io.EOF {
+			return r
+		}
 		if r.Success {
 			return r
 		}
