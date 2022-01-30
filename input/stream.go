@@ -96,9 +96,16 @@ func (l *Stream) String() string {
 
 // New creates a new parser input from a buffered reader.
 func New(input io.RuneReader) *Stream {
+	bufferSize := 1024 * 1024 // 1MB
+	return NewWithBufferSize(input, bufferSize)
+}
+
+// NewWithBufferSize allows the buffer to be sized appropriately for the input.
+// There's no need to allocate more than the length of the input as the buffer.
+func NewWithBufferSize(input io.RuneReader, size int) *Stream {
 	return &Stream{
 		Input:    input,
-		Buffer:   NewBuffer(1024 * 8),
+		Buffer:   NewBuffer(size),
 		position: NewPosition(1, 0),
 	}
 }
@@ -122,10 +129,10 @@ func (sr *StringRuneReader) ReadRune() (r rune, size int, err error) {
 
 // NewFromString creates a new parser input from an input string.
 func NewFromString(input string) *Stream {
-	return New(&StringRuneReader{
+	return NewWithBufferSize(&StringRuneReader{
 		position: 0,
 		s:        input,
-	})
+	}, len(input)+1)
 }
 
 // Collect returns the value of the consumed buffer and updates the position of the stream to the current
