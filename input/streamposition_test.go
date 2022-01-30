@@ -1,6 +1,7 @@
 package input
 
 import (
+	"io"
 	"testing"
 )
 
@@ -219,5 +220,51 @@ func TestStreamPositionFunction(t *testing.T) {
 	line, col = s.Position()
 	if line != 1 && col != 3 {
 		t.Errorf("Expected line 1 and col 3, but got %v:%v", line, col)
+	}
+}
+
+func TestStreamPositionEOF(t *testing.T) {
+	expected := "abc123"
+	s := NewFromString(expected)
+	var actual string
+	for {
+		r, err := s.Advance()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			t.Fatalf("unexpected error: %v", err)
+		}
+		actual = actual + string(r)
+	}
+	line, col := s.Position()
+	if line != 1 && col != 6 {
+		t.Errorf("EOF expected position 1:6, got %v:%v", line, col)
+	}
+	if actual != expected {
+		t.Errorf("expected %q, got %q", expected, actual)
+	}
+
+	s.Retreat()
+	line, col = s.Position()
+	if line != 1 && col != 5 {
+		t.Errorf("EOF-1: expected position 1:5, got %v:%v", line, col)
+	}
+}
+
+func TestStreamPositionSOF(t *testing.T) {
+	s := NewFromString("abc123")
+	var err error
+	_, err = s.Retreat()
+	if err != ErrStartOfFile {
+		t.Fatalf("expected SOF error, got: %v", err)
+	}
+	_, err = s.Retreat()
+	if err != ErrStartOfFile {
+		t.Fatalf("expected SOF error, got: %v", err)
+	}
+	line, col := s.Position()
+	if line != 1 && col != 1 {
+		t.Errorf("expected position 1:1, got %v:%v", line, col)
 	}
 }

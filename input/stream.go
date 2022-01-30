@@ -171,7 +171,9 @@ func (l *Stream) Advance() (r rune, err error) {
 	}
 
 	l.CurrentRune = r
-	l.position.Advance(l.CurrentRune)
+	if err == nil {
+		l.position.Advance(l.CurrentRune)
+	}
 	return r, err
 }
 
