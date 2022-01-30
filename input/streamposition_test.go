@@ -224,6 +224,7 @@ func TestStreamPositionFunction(t *testing.T) {
 }
 
 func TestStreamPositionEOF(t *testing.T) {
+	// Test we hit the EOF.
 	expected := "abc123"
 	s := NewFromString(expected)
 	var actual string
@@ -241,14 +242,29 @@ func TestStreamPositionEOF(t *testing.T) {
 	if line != 1 && col != 6 {
 		t.Errorf("EOF expected position 1:6, got %v:%v", line, col)
 	}
+	if s.Index() != 7 {
+		t.Errorf("EOF expected at index 7, got %d", s.Index())
+	}
 	if actual != expected {
 		t.Errorf("expected %q, got %q", expected, actual)
+	}
+
+	// Test we can't go past the EOF.
+	_, err := s.Advance()
+	if err != io.EOF {
+		t.Fatalf("EOF+1: unexpected error: %v", err)
+	}
+	if s.Index() != 7 {
+		t.Errorf("EOF+1: expected at index 7, got %d", s.Index())
 	}
 
 	s.Retreat()
 	line, col = s.Position()
 	if line != 1 && col != 5 {
 		t.Errorf("EOF-1: expected position 1:5, got %v:%v", line, col)
+	}
+	if s.Index() != 6 {
+		t.Errorf("EOF-1: expected at index 66, got %d", s.Index())
 	}
 }
 

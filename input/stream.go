@@ -87,6 +87,7 @@ type Stream struct {
 	CurrentRune rune
 	// Position is the current position within the file.
 	position Position
+	lastErr  error
 }
 
 func (l *Stream) String() string {
@@ -160,8 +161,11 @@ func fromBuffer(startOfBufferIndex int64, currentIndex int64, buffer *Buffer) (r
 // Advance reads a rune from the Input and sets the current position.
 func (l *Stream) Advance() (r rune, err error) {
 	// Check to see whether we already have it in the buffer, if so, read it from there.
-	l.Current++
+	if l.lastErr != nil {
+		return 0, l.lastErr
+	}
 
+	l.Current++
 	r, ok := fromBuffer(l.Start, l.Current, l.Buffer)
 	if !ok {
 		r, _, err = l.Input.ReadRune()
@@ -174,6 +178,7 @@ func (l *Stream) Advance() (r rune, err error) {
 	if err == nil {
 		l.position.Advance(l.CurrentRune)
 	}
+	l.lastErr = err
 	return r, err
 }
 
@@ -228,6 +233,7 @@ func (l *Stream) Retreat() (r rune, err error) {
 
 	l.CurrentRune = r
 	l.position.Retreat(l.CurrentRune)
+	l.lastErr = nil
 	return r, err
 }
 
