@@ -222,6 +222,9 @@ var ErrStartOfFile = errors.New("SOF")
 
 // Retreat steps back a rune.
 func (l *Stream) Retreat() (r rune, err error) {
+	if l.Current == 0 {
+		return 0x0, ErrStartOfFile
+	}
 	l.Current--
 
 	r, ok := fromBuffer(l.Start, l.Current, l.Buffer)

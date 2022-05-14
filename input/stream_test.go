@@ -2,6 +2,7 @@ package input
 
 import (
 	"io"
+	"strings"
 	"testing"
 )
 
@@ -290,5 +291,33 @@ func BenchmarkStreamPosition(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		s := NewFromString("ABCDEFG")
 		s.Position()
+	}
+}
+
+func TestStringInput(t *testing.T) {
+	x := `a
+b
+c
+d
+`
+
+	s := New(strings.NewReader(x))
+	s.Retreat()
+	s.Retreat()
+	s.Retreat()
+	s.Retreat()
+	s.Retreat()
+	s.Retreat()
+
+	var sb strings.Builder
+	for {
+		r, err := s.Advance()
+		if err == io.EOF {
+			break
+		}
+		sb.WriteRune(r)
+	}
+	if sb.String() != "a\nb\nc\nd\n" {
+		t.Errorf("Unexpected: %q", sb.String())
 	}
 }
