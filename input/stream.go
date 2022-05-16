@@ -169,6 +169,10 @@ func (l *Stream) Advance() (r rune, err error) {
 	r, ok := fromBuffer(l.Start, l.Current, l.Buffer)
 	if !ok {
 		r, _, err = l.Input.ReadRune()
+		if err != nil {
+			l.lastErr = err
+			return 0x0, err
+		}
 		if l.Buffer.Append(r) != nil {
 			return r, err
 		}
