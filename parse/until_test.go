@@ -73,3 +73,34 @@ func BenchmarkUntil(b *testing.B) {
 		parser(input.NewFromString("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
 	}
 }
+
+func TestStringUntilEOF(t *testing.T) {
+	tests := []struct {
+		input           string
+		parser          Function
+		expected        bool
+		expectedCapture string
+	}{
+		{
+			input:           "name=value",
+			parser:          StringUntilDelimiterOrEOF(String("=")),
+			expected:        true,
+			expectedCapture: "name=",
+		},
+		{
+			input:           "name=value",
+			parser:          StringUntilDelimiterOrEOF(String("z")),
+			expected:        true,
+			expectedCapture: "name=value",
+		},
+	}
+
+	for i, test := range tests {
+		pi := input.NewFromString(test.input)
+		result := test.parser(pi)
+		actual := result.Success
+		if actual != test.expected {
+			t.Errorf("test %v: for input '%v' expected %v but got %v, catpured '%v'", i, test.input, test.expected, actual, result.Item)
+		}
+	}
+}

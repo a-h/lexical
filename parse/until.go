@@ -1,29 +1,41 @@
 package parse
 
-//TODO: Create a generic Until function.
+import (
+	"io"
+	"strings"
+)
 
 // StringUntil captures runes until the delimiter is encountered and returns a string.
 func StringUntil(delimiter Function) Function {
 	return func(pi Input) Result {
-		return stringUntil(pi, delimiter)
+		return stringUntil(pi, delimiter, false)
 	}
 }
 
-func stringUntil(pi Input, delimiter Function) Result {
+func StringUntilDelimiterOrEOF(delimiter Function) Function {
+	return func(pi Input) Result {
+		return stringUntil(pi, delimiter, true)
+	}
+}
+
+func stringUntil(pi Input, delimiter Function, successOnEOF bool) Result {
 	name := "string until delimiter"
 
-	runes := make([]rune, 0)
+	var sb strings.Builder
 	for {
 		current := pi.Index()
 		ds := delimiter(pi)
 		if ds.Success {
 			rewind(pi, int(pi.Index()-current))
-			return Success(name, string(runes), ds.Error)
+			return Success(name, sb.String(), ds.Error)
 		}
 		r, err := pi.Advance()
 		if err != nil {
+			if err == io.EOF && successOnEOF {
+				return Success(name, sb.String(), nil)
+			}
 			return Failure(name, err)
 		}
-		runes = append(runes, r)
+		sb.WriteRune(r)
 	}
 }
