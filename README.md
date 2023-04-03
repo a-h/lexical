@@ -2,6 +2,9 @@
 
 A set of parsing tools for Go inspired by [Sprache](https://github.com/sprache/Sprache/).
 
+> **Warning**
+> This library is now unmaintained in favour of a Go generics rewrite at https://github.com/a-h/parse
+
 ## Input
 
 Parsers first need to read data to see if the data matches a pattern. If the data doesn't match, then the parser will need to move back to the end position of the last successful parse to try a different pattern.
