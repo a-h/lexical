@@ -1,9 +1,9 @@
+> **Warning**
+> This library is now unmaintained in favour of a Go generics rewrite at https://github.com/a-h/parse
+
 # Lexical
 
 A set of parsing tools for Go inspired by [Sprache](https://github.com/sprache/Sprache/).
-
-> **Warning**
-> This library is now unmaintained in favour of a Go generics rewrite at https://github.com/a-h/parse
 
 ## Input
 
